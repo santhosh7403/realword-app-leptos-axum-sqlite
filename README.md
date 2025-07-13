@@ -10,7 +10,7 @@ To make it run in few simple steps, made a sqlite version (though, [ recent opin
 
 Before proceeding to clone, you may take a look on the screenshots here, that will give a quick good insight into this app and you can decide.
 
-There is a Postgres version of this as well and you can find it here.
+There is a Postgres version of this as well and you can [ find it here ](https://github.com/santhosh7403/realword-app-leptos-07-axum).
 
 This app includes:<br/>
         Leptos<br/>
@@ -46,12 +46,11 @@ By default, `cargo-leptos` uses `nightly` Rust, `cargo-generate` etc. If you run
 4. `cargo install cargo-generate` - install `cargo-generate` binary (should be installed automatically in future)
 
  Now you may run the build.
-        
-    `cargo leptos watch`  or `cargo leptos serve` 
+
+    `cargo leptos watch`  or `cargo leptos serve`
 
 # Application access
 
 Once application started, access application from you web browser [ localhost:3000 ](http://localhost:3000/)
 
 To showcase and test, some dummy data is populated already. User names 'user1' to 'user5' are available and password is same as username. In case if you want to remove this data, you may delete the 'basedata' files inside migrations folder before build and run.
-
