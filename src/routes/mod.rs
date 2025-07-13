@@ -1,0 +1,9 @@
+pub mod article_modal;
+pub mod editor_modal;
+pub mod home_main;
+pub mod login_modal;
+pub mod profile_home;
+pub mod reset_password_modal;
+pub mod settings_modal;
+pub mod signup_modal;
+pub mod user_home;
