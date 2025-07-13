@@ -21,6 +21,7 @@ This app includes:<br/>
         argon2(password encrypt)<br/>
         uuid<br/>
         tailwindcss<br/>
+        fontawesome icons<br/>
 
 To test it out, clone the repo and run.
 
@@ -40,8 +41,9 @@ This expects cargo-leptos is installed already, if you don't have `cargo-leptos`
 By default, `cargo-leptos` uses `nightly` Rust, `cargo-generate` etc. If you run into any trouble, you may need to install one or more of these tools.
 
 1. `rustup toolchain install nightly --allow-downgrade` - make sure you have Rust nightly
-2. `rustup target add wasm32-unknown-unknown` - add the ability to compile Rust to WebAssembly
-3. `cargo install cargo-generate` - install `cargo-generate` binary (should be installed automatically in future)
+2. `rustup update` - update the rust toolchains to latest
+3. `rustup target add wasm32-unknown-unknown` - add the ability to compile Rust to WebAssembly
+4. `cargo install cargo-generate` - install `cargo-generate` binary (should be installed automatically in future)
 
  Now you may run the build.
         
