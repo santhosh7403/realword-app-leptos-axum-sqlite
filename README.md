@@ -25,9 +25,9 @@ This app includes:<br/>
 
 To test it out, clone the repo and run.
 
-`git clone https://github.com/santhosh7403/demo-tools-app-leptos-07-actix-tailwind.git`
+`git clone https://github.com/santhosh7403/realword-app-leptos-07-axum-sqlite.git`
 
-`cd demo-tools-app-leptos-07-actix-tailwind`
+`cd realword-app-leptos-07-axum-sqlite`
 
 `cargo leptos watch`  or `cargo leptos serve`
 
