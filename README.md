@@ -31,7 +31,7 @@ To test it out, clone the repo and run.
 
 `cargo leptos watch`  or `cargo leptos serve`
 
-This expects cargo-leptos is installed already, if you don't have `cargo-leptos` installed you can install it with
+This expects rust toolchains and cargo-leptos are installed already, if you don't have `cargo-leptos` installed you can install it with
 
 `cargo install cargo-leptos --locked`
 
@@ -45,7 +45,7 @@ By default, `cargo-leptos` uses `nightly` Rust, `cargo-generate` etc. If you run
 3. `rustup target add wasm32-unknown-unknown` - add the ability to compile Rust to WebAssembly
 4. `cargo install cargo-generate` - install `cargo-generate` binary (should be installed automatically in future)
 
- Now you may run the build.
+Now you may run the build.
 
     `cargo leptos watch`  or `cargo leptos serve`
 
