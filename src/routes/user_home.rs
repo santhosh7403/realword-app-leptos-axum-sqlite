@@ -267,7 +267,7 @@ fn TagList() -> impl IntoView {
     };
 
     view! {
-        <div class="flex gap-1 py-1">
+        <div class="flex gap-1 py-1 flex-wrap">
             <Suspense fallback=move || view! { <p>"Loading Tags"</p> }>
                 <ErrorBoundary fallback=|_| {
                     view! { <p class="error-messages text-xs-center">"Something went wrong."</p> }
