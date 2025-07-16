@@ -99,7 +99,7 @@ pub fn App() -> impl IntoView {
     };
 
     view! {
-        <Stylesheet id="leptos" href="/pkg/realworld-app-leptos-07-axum-sqlite.css" />
+        <Stylesheet id="leptos" href="/pkg/realworld-app-leptos-axum-sqlite.css" />
         <Body {..} class=body_class />
 
         // sets the document title

@@ -6,8 +6,8 @@ async fn main() {
     use leptos::logging::log;
     use leptos::prelude::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
-    use realworld_app_leptos_07_axum_sqlite::app::*;
-    use realworld_app_leptos_07_axum_sqlite::database;
+    use realworld_app_leptos_axum_sqlite::app::*;
+    use realworld_app_leptos_axum_sqlite::database;
 
     let conf = get_configuration(None).unwrap();
     let addr = conf.leptos_options.site_addr;
@@ -44,7 +44,7 @@ async fn main() {
                 ),
         )
         .layer(axum::middleware::from_fn(
-            realworld_app_leptos_07_axum_sqlite::auth::auth_middleware,
+            realworld_app_leptos_axum_sqlite::auth::auth_middleware,
         ))
         .with_state(leptos_options);
 
