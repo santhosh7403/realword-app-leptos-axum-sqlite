@@ -29,7 +29,7 @@ To test it out, clone the repo and run.
 
 `cd realword-app-leptos-axum-sqlite`
 
-`source .env`
+`source .env`  - set the DATABASE_URL env variable
 
 `cargo leptos watch`  or `cargo leptos serve`
 
@@ -38,7 +38,7 @@ Above command expects rust toolchains and cargo-leptos are installed already, if
 `cargo install cargo-leptos --locked`
 
 
-By default, `cargo-leptos` uses `nightly` Rust, `cargo-generate` etc. If you run into any trouble, you may need to install one or more of these tools.
+By default, `cargo-leptos` uses `nightly` Rust, `cargo-generate` etc. If you run into any trouble, you may need to install one or more of these tools. Please refer [ rustup here ](https://rustup.rs).
 
 1. `rustup toolchain install nightly --allow-downgrade` - make sure you have Rust nightly
 2. `rustup update` - update the rust toolchains to latest
