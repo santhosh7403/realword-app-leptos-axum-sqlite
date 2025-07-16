@@ -29,9 +29,11 @@ To test it out, clone the repo and run.
 
 `cd realword-app-leptos-axum-sqlite`
 
+`source .env`
+
 `cargo leptos watch`  or `cargo leptos serve`
 
-This expects rust toolchains and cargo-leptos are installed already, if you don't have `cargo-leptos` installed you can install it with
+Above command expects rust toolchains and cargo-leptos are installed already, if you don't have `cargo-leptos` installed you can install it with
 
 `cargo install cargo-leptos --locked`
 
@@ -41,11 +43,11 @@ By default, `cargo-leptos` uses `nightly` Rust, `cargo-generate` etc. If you run
 1. `rustup toolchain install nightly --allow-downgrade` - make sure you have Rust nightly
 2. `rustup update` - update the rust toolchains to latest
 3. `rustup target add wasm32-unknown-unknown` - add the ability to compile Rust to WebAssembly
-4. `cargo install cargo-generate` - install `cargo-generate` binary (should be installed automatically in future)
+4. `cargo install cargo-generate` - install cargo-generate binary
 
 Now you may run the build.
 
-    `cargo leptos watch`  or `cargo leptos serve`
+  `cargo leptos watch`  or `cargo leptos serve`
 
 # Application access
 
