@@ -10,7 +10,7 @@ To make it run in few simple steps, made a sqlite version (though, [ recent opin
 
 Before proceeding to clone, you may take a look on the [ screenshots here ](https://github.com/santhosh7403/realword-app-leptos-07-axum-sqlite/blob/main/App_Screenshots.md), that will give a quick good insight into this app and you can decide.
 
-There is a Postgres version of this as well and you can [ find it here ](https://github.com/santhosh7403/realword-app-leptos-07-axum).
+There is a Postgres version of this as well and you can [ find it here ](https://github.com/santhosh7403/realword-app-leptos-axum).
 
 This app includes:<br/>
         Leptos<br/>
