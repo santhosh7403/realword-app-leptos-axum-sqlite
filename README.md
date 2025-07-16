@@ -8,7 +8,7 @@ This is another Leptos demo application that I worked on as part of my learning 
 
 To make it run in few simple steps, made a sqlite version (though, [ recent opinions ](https://dev.to/shayy/everyone-is-wrong-about-sqlite-4gjf) suggest sqlite itself is good enough if your app isn't too many writes ). So to see it, just clone the project and run.
 
-Before proceeding to clone, you may take a look on the [ screenshots here ](https://github.com/santhosh7403/realword-app-leptos-07-axum-sqlite/blob/main/App_Screenshots.md), that will give a quick good insight into this app and you can decide.
+Before proceeding to clone, you may take a look on the [ screenshots here ](https://github.com/santhosh7403/realword-app-leptos-axum-sqlite/blob/main/App_Screenshots.md), that will give a quick good insight into this app and you can decide.
 
 There is a Postgres version of this as well and you can [ find it here ](https://github.com/santhosh7403/realword-app-leptos-axum).
 
