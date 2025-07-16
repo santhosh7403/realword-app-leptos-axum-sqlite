@@ -25,9 +25,9 @@ This app includes:<br/>
 
 To test it out, clone the repo and run.
 
-`git clone https://github.com/santhosh7403/realword-app-leptos-07-axum-sqlite.git`
+`git clone https://github.com/santhosh7403/realword-app-leptos-axum-sqlite.git`
 
-`cd realword-app-leptos-07-axum-sqlite`
+`cd realword-app-leptos-axum-sqlite`
 
 `cargo leptos watch`  or `cargo leptos serve`
 
