@@ -4,7 +4,7 @@
 </picture>
 
 
-This is another leptos demo application that I worked on as part of my learning rust/leptos and carry out experiments. This one is little more complex  compared to the previously shared one [ demo-tools-app-leptos-07-actix-tailwind ](https://github.com/santhosh7403/demo-tools-app-leptos-07-actix-tailwind). I hope this code may help anyone who is seriously considering leptos framework in their next project and wants a hands-on or see it in more realworld working example.
+This is another Leptos demo application that I worked on as part of my learning Rust/Leptos and carrying out experiments. This one is little more complex  compared to the previously shared one [ demo-tools-app-leptos-07-actix-tailwind ](https://github.com/santhosh7403/demo-tools-app-leptos-07-actix-tailwind). I hope this code may help anyone who is seriously considering Leptos framework in their next project and wants a hands-on or a more realworld working example.
 
 To make it run in few simple steps, made a sqlite version (though, [ recent opinions ](https://dev.to/shayy/everyone-is-wrong-about-sqlite-4gjf) suggest sqlite itself is good enough if your app isn't too many writes ). So to see it, just clone the project and run.
 
@@ -34,8 +34,6 @@ To test it out, clone the repo and run.
 This expects rust toolchains and cargo-leptos are installed already, if you don't have `cargo-leptos` installed you can install it with
 
 `cargo install cargo-leptos --locked`
-
-
 
 
 By default, `cargo-leptos` uses `nightly` Rust, `cargo-generate` etc. If you run into any trouble, you may need to install one or more of these tools.
