@@ -21,13 +21,8 @@ pub(crate) fn NavItems(
          rounded-b-xl px-4 py-3 md:py-4">
             <div class="flex justify-around items-center">
                 <A href="/">
-                    <div class="group flex flex-col items-center 
-                     p-3 md:p-4 rounded-xl 
-                     hover:bg-gray-700 hover:text-blue-300 
-                     transition-colors duration-200 
-                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                        <i class="fas fa-home text-2xl md:text-3xl transition-transform group-hover:scale-110
-                         "></i>
+                    <div class="group navitem">
+                        <i class="fas fa-home navitem-icon"></i>
                         <span class="text-xs md:text-base mt-1 font-semibold">Home</span>
                     </div>
                 </A>
@@ -36,48 +31,33 @@ pub(crate) fn NavItems(
                     fallback=move || {
                         view! {
                             <A href="/editor">
-                                <div class="group flex flex-col items-center
-                                 p-3 md:p-4 rounded-xl
-                                 hover:bg-gray-700 hover:text-blue-300
-                                 transition-colors duration-200
-                                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                    <i class="fa-solid fa-square-plus text-2xl md:text-3xl transition-transform group-hover:scale-110"></i>
+                                <div class="group navitem">
+                                    <i class="fa-solid fa-square-plus navitem-icon"></i>
                                     <span class="text-xs md:text-base mt-1 font-semibold">New Article</span>
                                 </div>
                             </A>
 
                             <A href="/settings">
-                                <div class="group flex flex-col items-center
-                                 p-3 md:p-4 rounded-xl
-                                 hover:bg-gray-700 hover:text-blue-300
-                                 transition-colors duration-200
-                                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                    <i class="fa-solid fa-gear text-2xl md:text-3xl transition-transform group-hover:scale-110"></i>
+                                <div class="group navitem">
+                                    <i class="fa-solid fa-gear navitem-icon"></i>
                                     <span class="text-xs md:text-base mt-1 font-semibold">Settings</span>
                                 </div>
                             </A>
                             <A href=profile_href.clone()>
-                                <div class="group flex flex-col items-center
-                                 p-3 md:p-4 rounded-xl
-                                 hover:bg-gray-700 hover:text-blue-300
-                                 transition-colors duration-200
-                                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                    <i class="fa-regular fa-circle-user text-2xl md:text-3xl transition-transform group-hover:scale-110"></i>
+                                <div class="group navitem">
+                                    <i class="fa-regular fa-circle-user navitem-icon"></i>
                                     <span class="text-xs md:text-base mt-1 font-semibold">{profile_label}</span>
                                 </div>
                             </A>
 
                             <ActionForm action=logout>
                                 <button
-                                    class="items-center border-none bg-transparent 
+                                    class="items-center border-none bg-transparent
                                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                     on:click=move |_| login.clear()
                                 >
-                                    <div class="group flex flex-col items-center
-                                     p-3 md:p-4 rounded-xl
-                                     hover:bg-gray-700 hover:text-blue-300
-                                     transition-colors duration-200">
-                                        <i class="fa-solid fa-right-from-bracket text-2xl md:text-3xl transition-transform group-hover:scale-110"></i>
+                                    <div class="group navitem">
+                                        <i class="fa-solid fa-right-from-bracket navitem-icon"></i>
                                         <span class="text-xs md:text-base mt-1 font-semibold">Logout</span>
                                     </div>
                                 </button>
@@ -86,12 +66,8 @@ pub(crate) fn NavItems(
                     }
                 >
                     <A href="/signup">
-                        <div class="group flex flex-col items-center
-                         p-3 md:p-4 rounded-xl
-                         hover:bg-gray-700 hover:text-blue-300
-                         transition-colors duration-200
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                            <i class="fa-solid fa-user-plus text-2xl md:text-3xl transition-transform group-hover:scale-110"></i>
+                        <div class="group navitem">
+                            <i class="fa-solid fa-user-plus navitem-icon"></i>
                             <span class="text-xs md:text-base mt-1 font-semibold">Sign up</span>
                         </div>
                     </A>
@@ -100,11 +76,8 @@ pub(crate) fn NavItems(
                         on:click=navigate_login
                         class="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
-                        <div class="group flex flex-col items-center
-                         p-3 md:p-4 rounded-xl
-                         hover:bg-gray-700 hover:text-blue-300
-                         transition-colors duration-200">
-                            <i class="fa-solid fa-right-to-bracket text-2xl md:text-3xl transition-transform group-hover:scale-110"></i>
+                        <div class="group navitem">
+                            <i class="fa-solid fa-right-to-bracket navitem-icon"></i>
                             <span class="text-xs md:text-base mt-1 font-semibold">Login</span>
                         </div>
                     </button>

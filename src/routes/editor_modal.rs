@@ -11,7 +11,7 @@ pub enum EditorResponse {
     UpdateError,
     Successful(String),
 }
-
+#[allow(dead_code)]
 #[cfg_attr(feature = "hydrate", allow(dead_code))]
 #[derive(Debug)]
 struct ArticleUpdate {
@@ -287,7 +287,7 @@ where
                                                 node_ref=editor_title
                                                 name="title"
                                                 type="text"
-                                                class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                class="input-field-common"
                                                 minlength=TITLE_MIN_LENGTH
                                                 placeholder="Article Title"
                                                 value=move || {
@@ -306,7 +306,7 @@ where
                                                 node_ref=editor_desc
                                                 name="description"
                                                 type="text"
-                                                class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                class="input-field-common"
                                                 minlength=DESCRIPTION_MIN_LENGTH
                                                 placeholder="What's this article about?"
                                                 value=move || {
@@ -324,7 +324,7 @@ where
                                             <textarea
                                                 node_ref=editor_body
                                                 name="body"
-                                                class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                class="input-field-common"
                                                 rows="8"
                                                 placeholder="Write your article (in markdown)"
                                                 minlength=BODY_MIN_LENGTH
@@ -344,7 +344,7 @@ where
                                                 node_ref=editor_tags
                                                 name="tag_list"
                                                 type="text"
-                                                class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                class="input-field-common"
                                                 placeholder="Enter tags(space separated)"
                                                 value=move || {
                                                     article_res

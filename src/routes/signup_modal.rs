@@ -116,7 +116,7 @@ where
                     <div class="mb-5">
                         <input
                             node_ref=acc_user
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            class="input-field-common"
                             id="username"
                             name="username"
                             type="text"
@@ -131,7 +131,7 @@ where
                     <div class="mb-5">
                         <input
                             node_ref=acc_email
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            class="input-field-common"
                             id="email"
                             name="email"
                             type="email"
@@ -146,7 +146,7 @@ where
                     <div class="mb-5 relative">
                         <input
                             node_ref=acc_password
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            class="input-field-common"
                             id="password"
                             name="password"
                             type=move || {

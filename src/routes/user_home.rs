@@ -111,12 +111,38 @@ pub fn HomePage(username: crate::auth::UsernameSignal) -> impl IntoView {
                     </div>
                     <ItemsPerPage />
                 </div>
-                <div class="flex gap-1 rounded bg-white mb-2">
-                    <span class="font-bold m-1">Popular Tags:</span>
-                    <TagList />
-                </div>
-
-                <ArticlePreviewList username articles />
+                <Show when=move || !pagination.get().unwrap_or_default().get_my_feed()>
+                    <div class="flex gap-1 rounded bg-white mb-2">
+                        <span class="font-bold m-1">Popular Tags:</span>
+                        <TagList />
+                    </div>
+                </Show>
+                <Show
+                    when=move || {
+                        articles
+                            .with(|x| {
+                                x.as_ref()
+                                    .map_or(0, |y| y.as_ref().map(Vec::len).unwrap_or_default())
+                            }) != 0
+                    }
+                    fallback=move || {
+                        view! {
+                            <div>
+                                <p>
+                                    {if pagination.get().unwrap_or_default().get_my_feed() {
+                                        "You are not following any other user!"
+                                    } else {
+                                        "No articles to list"
+                                    }}
+                                </p>
+                            </div>
+                        }
+                    }
+                >
+                    <Suspense fallback=move || view! { <p>"Loading..."</p> }>
+                        <ArticlePreviewList username articles />
+                    </Suspense>
+                </Show>
             </div>
             <div class="flex gap-4">
                 <PreviousNextButton articles />
@@ -144,7 +170,11 @@ fn YourFeedTab(
                     "{}",
                     if username.with(Option::is_some)
                         && !pagination
-                            .with(|x| { x.as_ref().map(crate::models::Pagination::get_my_feed).unwrap_or_default() })
+                            .with(|x| {
+                                x.as_ref()
+                                    .map(crate::models::Pagination::get_my_feed)
+                                    .unwrap_or_default()
+                            })
                     {
                         pagination
                             .get()
@@ -166,7 +196,11 @@ fn YourFeedTab(
                     if username.with(Option::is_none) {
                         "cursor-not-allowed bg-gray-200"
                     } else if pagination
-                        .with(|x| { x.as_ref().map(crate::models::Pagination::get_my_feed).unwrap_or_default() })
+                        .with(|x| {
+                            x.as_ref()
+                                .map(crate::models::Pagination::get_my_feed)
+                                .unwrap_or_default()
+                        })
                     {
                         "border-b-8 bg-gray-200"
                     } else {
@@ -192,7 +226,11 @@ fn GlobalFeedTab(pagination: Memo<Result<Pagination, ParamsError>>) -> impl Into
                 format!(
                     "px-1 m-1 font-bold {}",
                     if !pagination
-                        .with(|x| { x.as_ref().map(crate::models::Pagination::get_my_feed).unwrap_or_default() })
+                        .with(|x| {
+                            x.as_ref()
+                                .map(crate::models::Pagination::get_my_feed)
+                                .unwrap_or_default()
+                        })
                     {
                         "border-b-8 bg-gray-200"
                     } else {
@@ -222,6 +260,7 @@ fn GlobalFeedTab(pagination: Memo<Result<Pagination, ParamsError>>) -> impl Into
 fn TagList() -> impl IntoView {
     let pagination = use_query::<crate::models::Pagination>();
     let tag_list = Resource::new(|| (), |_| async { get_tags().await });
+
     let tag_view = move || {
         let tag_elected = pagination.with(|x| {
             x.as_ref()
@@ -248,11 +287,16 @@ fn TagList() -> impl IntoView {
                                             )
                                         }
                                         href=move || {
-                                            pagination
-                                                .get()
-                                                .unwrap_or_default()
-                                                .set_tag(if same { "" } else { &t2 })
-                                                .to_string()
+                                            if same {
+                                                pagination.get().unwrap_or_default().set_tag("").to_string()
+                                            } else {
+                                                pagination
+                                                    .get()
+                                                    .unwrap_or_default()
+                                                    .set_tag(&t2)
+                                                    .reset_page()
+                                                    .to_string()
+                                            }
                                         }
                                     >
                                         {t}

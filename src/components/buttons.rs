@@ -1,3 +1,4 @@
+use crate::routes::article_modal::FollowUser;
 use leptos::prelude::*;
 
 #[server(FollowAction, "/api")]
@@ -51,7 +52,9 @@ pub fn ButtonFollow(
     logged_user: crate::auth::UsernameSignal,
     author: ReadSignal<String>,
 ) -> impl IntoView {
-    let following_signal = use_context::<RwSignal<bool>>();
+    // let following_signal = use_context::<RwSignal<bool>>();
+    let following_signal = use_context::<RwSignal<FollowUser>>();
+
     let follow = ServerAction::<FollowAction>::new();
     let follow_update = move || {
         follow.dispatch(FollowAction {
@@ -59,7 +62,7 @@ pub fn ButtonFollow(
         });
 
         following_signal
-            .map(|fso| fso.update(|fs| *fs = !*fs))
+            .map(|fso| fso.update(|fs| fs.0 = !fs.0))
             .expect("following_signal read from context error")
     };
 
@@ -84,11 +87,11 @@ pub fn ButtonFollow(
                         class="btn btn-sm btn-outline-secondary"
                         class=(
                             "text-yellow-500",
-                            move || !is_hovered.get() && following_signal.get().unwrap_or_default(),
+                            move || !is_hovered.get() && following_signal.get().unwrap_or(FollowUser(false)).0,
                         )
                         class=(
                             "text-yellow-400",
-                            move || is_hovered.get() && !following_signal.get().unwrap_or_default(),
+                            move || is_hovered.get() && !following_signal.get().unwrap_or(FollowUser(false)).0,
                         )
                         disabled=move||follow.pending().get()
                         on:click=move|_|follow_update()
@@ -96,7 +99,7 @@ pub fn ButtonFollow(
                         on:mouseleave=move |_| set_is_hovered(false)
                     >
                         <Show
-                            when=move || following_signal.get().unwrap_or_default()
+                            when=move || following_signal.get().unwrap_or(FollowUser(false)).0
                             fallback=|| {
                                 view! {
                                     <i class="fa-solid fa-person-circle-plus w-4 h-4"></i>

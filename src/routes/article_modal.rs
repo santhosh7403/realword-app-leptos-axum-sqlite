@@ -4,7 +4,7 @@ use crate::components::user_icons::{AuthorUserIcon, CommentUserIcon, CurrentUser
 use crate::models::{Comment, User};
 use leptos::html::Textarea;
 use leptos::prelude::*;
-use leptos_meta::*;
+use leptos_meta::Title;
 use leptos_router::hooks::use_params_map;
 use reactive_stores::Store;
 
@@ -13,6 +13,9 @@ pub struct ArticleResult {
     pub(super) article: crate::models::Article,
     pub(super) logged_user: Option<crate::models::User>,
 }
+
+#[derive(Clone)]
+pub struct FollowUser(pub bool);
 
 #[server(GetArticleAction, "/api", "GetJson")]
 #[tracing::instrument]
@@ -85,7 +88,8 @@ fn ArticlePage(username: crate::auth::UsernameSignal, result: ArticleResult) -> 
         navigate(&url_str, Default::default());
     };
 
-    let following_signal = RwSignal::new(false);
+    let following_signal =
+        RwSignal::new(FollowUser(article_signal.get_untracked().author.following));
     provide_context(following_signal);
 
     view! {

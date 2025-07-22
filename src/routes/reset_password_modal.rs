@@ -38,7 +38,7 @@ pub async fn reset_password_1(email: String) -> Result<String, ServerFnError> {
             passwd: mailer_constants::MAILER_PASSWD.to_string(),
             smtp_server: mailer_constants::MAILER_SMTP_SERVER.to_string(),
         });
-        let host = leptos_axum::extract::<axum::extract::Host>().await?.0;
+        let host = leptos_axum::extract::<axum_extra::extract::Host>().await?.0;
         let schema = if cfg!(debug_assertions) {
             "http"
         } else {
@@ -344,7 +344,7 @@ where
                                     <input
                                         node_ref=user_new_password
                                         name="password"
-                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        class="input-field-common"
                                         type=move || {
                                             format!(
                                                 "{}",
@@ -377,7 +377,7 @@ where
                                     <input
                                         node_ref=user_confirm_password
                                         name="confirm_password"
-                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        class="input-field-common"
                                         type=move || {
                                             format!(
                                                 "{}",
@@ -414,7 +414,7 @@ where
                                 Provide your linked email address with your user account.
                                 <input
                                     node_ref=user_email
-                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    class="input-field-common"
                                     id="email"
                                     name="email"
                                     type="text"
@@ -445,7 +445,7 @@ where
                     </div>
                     <div class="flex justify-between mb-5">
                         <button
-                            class="bg-blue-700 hover:bg-blue-800 px-5 py-3 text-white rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-700"
+                            class="btn-primary"
                             type="button"
                             prop:disabled=move || is_button_disabled
                             on:click=on_in_event
@@ -458,7 +458,7 @@ where
                                 format!(
                                     "{}",
                                     if reset_status.get().starts_with("Email sent.") {
-                                        "bg-blue-700 hover:bg-blue-800 px-5 py-3 text-white rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-700"
+                                        "btn-primary"
                                     } else {
                                         "bg-gray-300 hover:bg-gray-400 px-5 py-3 text-white rounded-lg"
                                     },

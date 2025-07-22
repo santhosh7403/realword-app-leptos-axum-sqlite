@@ -53,4 +53,4 @@ Now you may run the build.
 
 Once application started, access application from you web browser [ localhost:3000 ](http://localhost:3000/)
 
-To showcase the app and test, some sample users and data are populated. User names 'user1' to 'user5' are available and password is same as username. In case if you want to remove this data, you may delete the 'basedata' files inside migrations folder before build and run.
+To showcase the app and test, some sample users and data are populated. User names 'user1' to 'user5' are available and password is same as username. In case if you want to remove this data, you may delete the 'basedata' files inside migrations folder and setup database as explained in [ database readme ](https://github.com/santhosh7403/realword-app-leptos-axum-sqlite/blob/main/README_DATABASE.md).

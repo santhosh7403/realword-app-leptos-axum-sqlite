@@ -421,7 +421,7 @@ where
                     <div class="mb-5">
                         <input
                             node_ref=user_profile_pic_url
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            class="input-field-common"
                             name="username"
                             type="text"
                             value=user.image()
@@ -433,7 +433,7 @@ where
                         <input
                             disabled
                             node_ref=user_name
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline cursor-not-allowed"
+                            class="input-field-common cursor-not-allowed"
                             type="text"
                             placeholder=user.username()
                         />
@@ -442,7 +442,7 @@ where
                         <textarea
                             name="bio"
                             node_ref=user_bio
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            class="input-field-common"
                             prop:value=user.bio().unwrap_or_default()
                             placeholder="Short bio about you"
                             on:input=on_bio_input
@@ -451,7 +451,7 @@ where
                     <div class="mb-5">
                         <input
                             node_ref=user_email
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            class="input-field-common"
                             value=user.email()
                             type="text"
                             placeholder="Email (required)"
@@ -462,7 +462,7 @@ where
                         <input
                             node_ref=user_new_password
                             name="password"
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            class="input-field-common"
                             // type="password"
                             type=move || {
                                 format!(
@@ -494,7 +494,7 @@ where
                         <input
                             node_ref=user_confirm_password
                             name="confirm_password"
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            class="input-field-common"
                             type=move || {
                                 format!(
                                     "{}",
@@ -540,7 +540,7 @@ where
                     </div>
                     <div class="flex justify-between mb-5">
                         <button
-                            class="bg-blue-700 hover:bg-blue-800 px-5 py-3 text-white rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-700"
+                            class="btn-primary"
                             type="button"
                             prop:disabled=move || is_button_disabled
                             on:click=on_in_event
@@ -553,7 +553,7 @@ where
                                 format!(
                                     "{}",
                                     if update_status.get().starts_with("Successful.") {
-                                        "bg-blue-700 hover:bg-blue-800 px-5 py-3 text-white rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-700"
+                                        "btn-primary"
                                     } else {
                                         "bg-gray-300 hover:bg-gray-400 px-5 py-3 text-white rounded-lg"
                                     },

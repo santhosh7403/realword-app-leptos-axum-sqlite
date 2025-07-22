@@ -112,10 +112,9 @@ pub fn ArticleMeta(
         == article.with_untracked(|x| x.author.username.to_string());
 
     let (author, set_author) = signal(String::new());
-    Effect::new(move |_| {
+    let author_user = move || {
         set_author(article.with(|x| x.author.username.to_string()));
-        // following_signal.set(article.with(|x| x.author.following));
-    });
+    };
     let global_state = expect_context::<Store<GlobalState>>();
     let back_url = move || global_state.back_url().get().to_string();
 
@@ -157,12 +156,12 @@ pub fn ArticleMeta(
                                 fallback=move || {
                                     view! {
                                         <Show
-                                            when=move || username.with(Option::is_some)
+                                            when=move || {author_user(); username.with(Option::is_some)}
                                             fallback=move || {
-                                                view! { <ButtonFav username=username article=article /> }
+                                                view! { <ButtonFav username article /> }
                                             }
                                         >
-                                            <ButtonFav username=username article=article />
+                                            <ButtonFav username article />
                                             <ButtonFollow logged_user=username author />
                                         </Show>
                                     }

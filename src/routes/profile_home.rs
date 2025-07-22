@@ -77,7 +77,10 @@ pub async fn user_profile(username: String) -> Result<UserProfileModel, ServerFn
 #[component]
 pub fn Profile(username: crate::auth::UsernameSignal) -> impl IntoView {
     let params = use_params_map();
+
     let route_user = move || params.with(|x| x.get("user").unwrap_or_default());
+    // let (route_user, set_route_user) = signal(String::new());
+    // Effect::new(move || set_route_user(params.with(|x| x.get("user").unwrap_or_default())));
 
     let global_state = expect_context::<Store<GlobalState>>();
     global_state.is_profile().set(true);
@@ -96,22 +99,27 @@ pub fn Profile(username: crate::auth::UsernameSignal) -> impl IntoView {
     view! {
         <Title text=move || format!("{}'s profile", route_user()) />
         <div>
-            <ProfileHome on_back_event username />
+            <ProfileHome on_back_event username route_user/>
         </div>
     }
 }
 
 #[component]
-pub fn ProfileHome<C>(on_back_event: C, username: crate::auth::UsernameSignal) -> impl IntoView
+pub fn ProfileHome<C, D>(
+    on_back_event: C,
+    username: crate::auth::UsernameSignal,
+    route_user: D,
+) -> impl IntoView
 where
     C: Fn() + 'static + Copy + Send,
+    D: Fn() -> String + 'static + Copy + Send + Sync,
 {
     let pagination = use_query::<crate::models::Pagination>();
     let per_page: RwSignal<Option<u32>> =
         use_context().expect("per_page context should be available");
 
-    let params = use_params_map();
-    let route_user = move || params.with_untracked(|x| x.get("user").unwrap_or_default());
+    // let params = use_params_map();
+    // let route_user = move || params.with_untracked(|x| x.get("user").unwrap_or_default());
     let query = use_query_map();
     let favourite = move || query.with(|x| x.get("favourites").map(|_| true));
 
@@ -264,9 +272,10 @@ where
     C: Fn() + 'static + Copy + Send,
 {
     let params = use_params_map();
-    let resource = OnceResource::new(async move {
-        user_profile(params.with_untracked(|x| x.get("user").unwrap_or_default())).await
-    });
+    let resource = Resource::new(
+        move || (params.with(|x| x.get("user").clone().unwrap_or_default())),
+        move |user| async move { user_profile(user).await },
+    );
 
     view! {
         <div class="gap-4 shadow-md rounded-lg mb-3 px-2 py-2 bg-white">
