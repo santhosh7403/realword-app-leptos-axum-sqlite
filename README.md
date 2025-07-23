@@ -1,3 +1,6 @@
+A near realworld leptos web app with axum sqlite backend
+=======
+
 <picture>
     <source srcset="https://raw.githubusercontent.com/leptos-rs/leptos/main/docs/logos/Leptos_logo_Solid_White.svg" media="(prefers-color-scheme: dark)">
     <img src="https://raw.githubusercontent.com/leptos-rs/leptos/main/docs/logos/Leptos_logo_RGB.svg" alt="Leptos Logo">
@@ -53,4 +56,19 @@ Now you may run the build.
 
 Once application started, access application from you web browser [ localhost:3000 ](http://localhost:3000/)
 
+
+The application screen looks like this 
+<img width="1809" height="1030" alt="image" src="https://github.com/user-attachments/assets/0c7d129d-6146-4d91-80f5-4659c58c117b" />
+
+
+More screenshots are [ available here ](https://github.com/santhosh7403/realword-app-leptos-axum-sqlite/blob/main/App_Screenshots.md)
+
 To showcase the app and test, some sample users and data are populated. User names 'user1' to 'user5' are available and password is same as username. In case if you want to remove this data, you may delete the 'basedata' files inside migrations folder and setup database as explained in [ database readme ](https://github.com/santhosh7403/realword-app-leptos-axum-sqlite/blob/main/README_DATABASE.md).
+
+
+# Inspiration and Thanks
+
+The base of this app is from [ here ](https://github.com/Bechma/realworld-leptos), though there may be other original versions some where else, not sure.
+
+I initially started this as leptos06 to 07 change in this app (though, above reference repo also seems updated now!) as my learning and got interest to try out more experiments. Overall user interface changed, some with modal windows, tailwindcss and fontawesome icons, re-wired pages, some functionality changes etc. Now looking to add the FTS (full text search) and so on.
+
