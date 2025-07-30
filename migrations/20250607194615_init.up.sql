@@ -88,7 +88,7 @@ CREATE TRIGGER IF NOT EXISTS articletags_au AFTER UPDATE ON articletags BEGIN
 END;
 
 -- Delete trigger: When a document is deleted, remove it from FTS5
-CREATE TRIGGER IF NOT EXISTS articletags_ad AFTER DELETE ON articles BEGIN
+CREATE TRIGGER IF NOT EXISTS articletags_ad AFTER DELETE ON articletags BEGIN
     INSERT INTO articletags_fts(articletags_fts, rowid, article, tag) VALUES ('delete', OLD.oid, OLD.article, OLD.tag);
 END;
 

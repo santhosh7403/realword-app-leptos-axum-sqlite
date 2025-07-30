@@ -43,6 +43,8 @@ pub struct GlobalState {
     back_url: String,
     is_profile: bool,
     home_url: String,
+    search_tab: bool,
+    search_window: bool,
 }
 
 impl Default for GlobalState {
@@ -51,6 +53,8 @@ impl Default for GlobalState {
             back_url: "/".to_string(),
             is_profile: false,
             home_url: "/".to_string(),
+            search_tab: false,
+            search_window: false,
         }
     }
 }

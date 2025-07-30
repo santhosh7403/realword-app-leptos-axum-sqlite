@@ -1,8 +1,10 @@
 use crate::app::{GlobalState, GlobalStateStoreFields};
 use crate::models::Pagination;
-use leptos::prelude::*;
+use leptos::{html::Input, prelude::*};
 use leptos_meta::*;
+// use leptos_router::hooks::use_query_map;
 use leptos_router::{
+    components::A,
     hooks::{use_location, use_query},
     params::ParamsError,
 };
@@ -44,6 +46,24 @@ async fn get_tags() -> Result<Vec<String>, ServerFnError> {
             tracing::error!("problem while fetching tags: {x:?}");
             ServerFnError::ServerError("Problem while fetching tags".into())
         })
+}
+
+#[server(SearchAction)]
+async fn fetch_results(
+    search: String,
+) -> Result<Vec<crate::models::MatchedArticles>, ServerFnError> {
+    if search.is_empty() {
+        Err(ServerFnError::new("Empty search string, hence ignore"))
+    } else {
+        Ok(
+            crate::models::MatchedArticles::search_articles(search, 0, 10)
+                .await
+                .map_err(|x| {
+                    tracing::error!("problem while fetching search articles: {x:?}");
+                    ServerFnError::new("Problem while fetching search articles")
+                })?,
+        )
+    }
 }
 
 /// Renders the home page of your application.
@@ -100,17 +120,70 @@ pub fn HomePage(username: crate::auth::UsernameSignal) -> impl IntoView {
             .set_amount(per_page.get().unwrap());
     });
 
+    let search_string: NodeRef<Input> = NodeRef::new();
+    let search_param = RwSignal::new(String::new());
+    // let search = move || query.read().get("q").unwrap_or_default();
+    // let run_search = ServerAction::<SearchAction>::new();
+    let on_search = move || {
+        search_param.set(
+            search_string
+                .get()
+                .expect("search <Input> has to exist")
+                .value(),
+        );
+    };
+
+    // let search_results = OnceResource::new(fetch_results(search));
+    // let search_results = Resource::new(search, |s| fetch_results(s));
+    // let search_results = LocalResource::new(move || fetch_results(search.get()));
+
     view! {
         <Title text="Home" />
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 bg-gray-200 px-2 py-2 sm:px-0">
             <div class="">
-                <div class="flex justify-between mb-2">
+                <div class="flex justify-between">
                     <div>
                         <YourFeedTab username pagination />
                         <GlobalFeedTab pagination />
                     </div>
+                    <div>
+                        <SearchTab />
+                    </div>
                     <ItemsPerPage />
                 </div>
+                <Show when=move || global_state.search_window().get()>
+
+                    <div class="flex justify-end">
+                        <div class="w-3/5">
+                            <div class="mb-2 relative flex justify-end">
+                                <input
+                                    node_ref=search_string
+                                    class="shadow appearance-none bg-white border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    name="search"
+                                    type="text"
+                                    value=move || { String::new() }
+                                    placeholder="Search string"
+                                    required=true
+                                />
+                                <span class="absolute inset-y-0 right-8 flex items-center pr-3">
+                                    <i class="fas fa-magnifying-glass"></i>
+                                </span>
+                                <button
+                                    class="px-2 cursor-pointer"
+                                    type="button"
+                                    on:click=move |_| on_search()
+                                >
+                                    Go
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <Show when=move || !search_param.get().is_empty()>
+                        // <SearchOut article_out=search_results />
+                        <SearchResults search_param />
+                    </Show>
+                </Show>
+
                 <Show when=move || !pagination.get().unwrap_or_default().get_my_feed()>
                     <div class="flex gap-1 rounded bg-white mb-2">
                         <span class="font-bold m-1">Popular Tags:</span>
@@ -152,6 +225,97 @@ pub fn HomePage(username: crate::auth::UsernameSignal) -> impl IntoView {
 }
 
 #[component]
+fn SearchResults(search_param: RwSignal<String>) -> impl IntoView {
+    // let results = fetch_results(search.get());
+    let articles_out = LocalResource::new(move || fetch_results(search_param.get()));
+
+    // #[component]
+    // fn SearchOut(
+    //     article_out: Resource<Result<Vec<crate::models::MatchedArticles>, ServerFnError>>,
+    // ) -> impl IntoView {
+    let articles_view = move || {
+        articles_out.with(move |x| {
+            x.clone().map(move |res| {
+                view! {
+                    <Suspense fallback=move || view! { <p>"Loading..."</p> }>
+                        <For
+                            each=move || res.clone().unwrap_or_default().into_iter().enumerate()
+                            key=|(i, _)| *i
+                            children=move |(_, article)| {
+                                view! { <SearchView article_res=article /> }
+                            }
+                        />
+                    </Suspense>
+                }
+            })
+        })
+    };
+    view! {
+        <Suspense fallback=move || view! { <p>"Loading Search Articles"</p> }>
+            <ErrorBoundary fallback=|_| {
+                view! { <p class="error-messages text-xs-center">"Something went wrong."</p> }
+            }>{articles_view}</ErrorBoundary>
+        </Suspense>
+    }
+}
+
+#[component]
+fn SearchView(article_res: crate::models::MatchedArticles) -> impl IntoView {
+    view! {
+        <div class="mb-2 p-4 bg-white rounded-lg shadow-md">
+            <p>
+                <span class="font-bold">"Title: "</span>
+                <span inner_html=article_res.title></span>
+            </p>
+            <p>
+                <span class="font-bold">"Description: "</span>
+                <span inner_html=article_res.description></span>
+            </p>
+            <p>
+                <span class="font-bold">"Body: "</span>
+                <span inner_html=article_res.body></span>
+            </p>
+            <div class="flex justify-end">
+                <A href=move || format!("/article/{}", article_res.slug)>
+                    <span class="text-blue-600 underline cursor-pointer">
+                        "Read more..."
+                    </span>
+                </A>
+            </div>
+        </div>
+    }
+}
+
+#[component]
+fn SearchTab(// tab_focus: RwSignal<bool>
+) -> impl IntoView {
+    let global_state = expect_context::<Store<GlobalState>>();
+
+    view! {
+        <button
+
+            type="button"
+            on:click=move |_| { global_state.search_window().update(|t| { *t = !*t }) }
+            on:keypress=move |kp| kp.prevent_default()
+            on:keydown=move |kp| kp.prevent_default()
+            on:keyup=move |kp| kp.prevent_default()
+            class=move || {
+                format!(
+                    "px-1 m-1 font-bold {}",
+                    if global_state.search_tab().get() {
+                        "border-b-8 bg-gray-200"
+                    } else {
+                        "bg-gray-200 cursor-pointer"
+                    },
+                )
+            }
+        >
+            "Search"
+        </button>
+    }
+}
+
+#[component]
 fn YourFeedTab(
     username: RwSignal<Option<String>>,
     pagination: Memo<Result<Pagination, ParamsError>>,
@@ -188,6 +352,7 @@ fn YourFeedTab(
                     },
                 );
                 global_state.back_url().set(your_feed_url.clone());
+                global_state.search_tab().set(false);
                 navigate(&your_feed_url, Default::default());
             }
             class=move || {
@@ -200,7 +365,7 @@ fn YourFeedTab(
                             x.as_ref()
                                 .map(crate::models::Pagination::get_my_feed)
                                 .unwrap_or_default()
-                        })
+                        }) && !global_state.search_tab().get()
                     {
                         "border-b-8 bg-gray-200"
                     } else {
@@ -230,7 +395,7 @@ fn GlobalFeedTab(pagination: Memo<Result<Pagination, ParamsError>>) -> impl Into
                             x.as_ref()
                                 .map(crate::models::Pagination::get_my_feed)
                                 .unwrap_or_default()
-                        })
+                        }) && !global_state.search_tab().get()
                     {
                         "border-b-8 bg-gray-200"
                     } else {
@@ -248,6 +413,7 @@ fn GlobalFeedTab(pagination: Memo<Result<Pagination, ParamsError>>) -> impl Into
                     .set_amount(per_page.get().unwrap())
                     .to_string();
                 global_state.back_url().set(global_feed_url.clone());
+                global_state.search_tab().set(false);
                 navigate(&global_feed_url, Default::default())
             }
         >
