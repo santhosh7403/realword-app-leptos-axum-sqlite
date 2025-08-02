@@ -1,3 +1,4 @@
+use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
@@ -81,7 +82,7 @@ pub struct MatchedArticles {
 
 impl MatchedArticles {
     #[tracing::instrument]
-    #[cfg(feature = "ssr")]
+    // #[cfg(feature = "ssr")]
     pub async fn search_articles(
         query: String,
         page: i64,

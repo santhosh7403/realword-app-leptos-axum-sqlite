@@ -2,13 +2,13 @@ use crate::app::{GlobalState, GlobalStateStoreFields};
 use crate::models::Pagination;
 use leptos::{html::Input, prelude::*};
 use leptos_meta::*;
-// use leptos_router::hooks::use_query_map;
 use leptos_router::{
     components::A,
     hooks::{use_location, use_query},
     params::ParamsError,
 };
 use reactive_stores::Store;
+use serde::{Deserialize, Serialize};
 
 use crate::components::{
     article_preview::ArticlePreviewList, items_per_page::ItemsPerPage,
@@ -48,22 +48,57 @@ async fn get_tags() -> Result<Vec<String>, ServerFnError> {
         })
 }
 
+#[derive(Serialize, Deserialize, Clone, Default, Debug)]
+pub struct MatchedArticles {
+    pub slug: String,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub body: Option<String>,
+}
+
 #[server(SearchAction)]
-async fn fetch_results(
-    search: String,
-) -> Result<Vec<crate::models::MatchedArticles>, ServerFnError> {
-    if search.is_empty() {
-        Err(ServerFnError::new("Empty search string, hence ignore"))
-    } else {
-        Ok(
-            crate::models::MatchedArticles::search_articles(search, 0, 10)
-                .await
-                .map_err(|x| {
-                    tracing::error!("problem while fetching search articles: {x:?}");
-                    ServerFnError::new("Problem while fetching search articles")
-                })?,
+async fn fetch_results(search: String) -> Result<Vec<MatchedArticles>, ServerFnError> {
+    let page = 0;
+    let amount = 10;
+    let offset = page * amount;
+    // if search.is_empty() {
+    //     Err(ServerFnError::new("Empty search string, hence ignore"))
+    // } else {
+    //     Ok(
+    // crate::models::MatchedArticles::search_articles(search, 0, 10)
+    //     .await
+    //     .map_err(|x| {
+    //         tracing::error!("problem while fetching search articles: {x:?}");
+    //         ServerFnError::new("Problem while fetching search articles")
+    //     })?,
+
+    sqlx::query!(
+            // MatchedArticles,
+            r#"
+SELECT distinct
+a.slug as slug,
+snippet(articles_fts,1, '<span class="bg-yellow-300">','</span>','<span class="bg-yellow-300">  ...  </span>',10) as "title: String",
+snippet(articles_fts,2, '<span class="bg-yellow-300">','</span>','<span class="bg-yellow-300">  ...  </span>',20) as "description: String",
+snippet(articles_fts,3, '<span class="bg-yellow-300">','</span>','<span class="bg-yellow-300">  ...  </span>',20) as "body: String"
+FROM Articles_fts AS AFTS
+JOIN  Articles AS A  ON A.oid = AFTS.rowid
+WHERE Articles_fts MATCH $3
+order by rank
+LIMIT $1 OFFSET $2"#,
+            amount,
+            offset,
+            search,
         )
-    }
+        .map(|x| MatchedArticles {
+            slug: x.slug,
+            title: x.title,
+            description: x.description,
+            body: x.body,
+        })
+        .fetch_all(crate::database::get_db())
+        .await
+        .map_err(|e| ServerFnError::new(format!("Some problem occured in sqlite query - {}", e.to_string())))
+    // )
 }
 
 /// Renders the home page of your application.
@@ -120,22 +155,31 @@ pub fn HomePage(username: crate::auth::UsernameSignal) -> impl IntoView {
             .set_amount(per_page.get().unwrap());
     });
 
-    let search_string: NodeRef<Input> = NodeRef::new();
-    let search_param = RwSignal::new(String::new());
+    // let search_string: NodeRef<Input> = NodeRef::new();
+    // let search_param = RwSignal::new(String::new());
     // let search = move || query.read().get("q").unwrap_or_default();
-    // let run_search = ServerAction::<SearchAction>::new();
-    let on_search = move || {
-        search_param.set(
-            search_string
-                .get()
-                .expect("search <Input> has to exist")
-                .value(),
-        );
-    };
+    let run_search = ServerAction::<SearchAction>::new();
+    // let on_search = move || {
+    //     search_param.set(
+    //         search_string
+    //             .get()
+    //             .expect("search <Input> has to exist")
+    //             .value(),
+    //     );
+    // };
 
     // let search_results = OnceResource::new(fetch_results(search));
     // let search_results = Resource::new(search, |s| fetch_results(s));
     // let search_results = LocalResource::new(move || fetch_results(search.get()));
+    Effect::new(move || {
+        if run_search.value().get().is_some() && !run_search.pending().get() {
+            global_state.search_window().set(true);
+            leptos::logging::log!("setting window true");
+        } else {
+            global_state.search_window().set(false);
+            leptos::logging::log!("setting window false");
+        }
+    });
 
     view! {
         <Title text="Home" />
@@ -147,43 +191,46 @@ pub fn HomePage(username: crate::auth::UsernameSignal) -> impl IntoView {
                         <GlobalFeedTab pagination />
                     </div>
                     <div>
-                        <SearchTab />
+                        <SearchArticle run_search />
+                    // <SearchClear run_search />
                     </div>
                     <ItemsPerPage />
                 </div>
+                // <Show when=move || global_state.search_window().get()>
+
+                // <div class="flex justify-end">
+                // <div class="w-3/5">
+                // <div class="mb-2 relative flex justify-end">
+                // <input
+                // node_ref=search_string
+                // class="shadow appearance-none bg-white border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                // name="search"
+                // type="text"
+                // value=move || { String::new() }
+                // placeholder="Search string"
+                // required=true
+                // />
+                // <span class="absolute inset-y-0 right-8 flex items-center pr-3">
+                // <i class="fas fa-magnifying-glass"></i>
+                // </span>
+                // <button
+                // class="px-2 cursor-pointer"
+                // type="button"
+                // on:click=move |_| on_search()
+                // >
+                // Go
+                // </button>
+                // </div>
+                // </div>
+                // </div>
+                // <Show when=move || !search_param.get().is_empty()>
+                // // <SearchOut article_out=search_results />
+                // <SearchResults search_param />
+                // </Show>
+                // </Show>
                 <Show when=move || global_state.search_window().get()>
-
-                    <div class="flex justify-end">
-                        <div class="w-3/5">
-                            <div class="mb-2 relative flex justify-end">
-                                <input
-                                    node_ref=search_string
-                                    class="shadow appearance-none bg-white border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    name="search"
-                                    type="text"
-                                    value=move || { String::new() }
-                                    placeholder="Search string"
-                                    required=true
-                                />
-                                <span class="absolute inset-y-0 right-8 flex items-center pr-3">
-                                    <i class="fas fa-magnifying-glass"></i>
-                                </span>
-                                <button
-                                    class="px-2 cursor-pointer"
-                                    type="button"
-                                    on:click=move |_| on_search()
-                                >
-                                    Go
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <Show when=move || !search_param.get().is_empty()>
-                        // <SearchOut article_out=search_results />
-                        <SearchResults search_param />
-                    </Show>
+                    <SearchResults run_search />
                 </Show>
-
                 <Show when=move || !pagination.get().unwrap_or_default().get_my_feed()>
                     <div class="flex gap-1 rounded bg-white mb-2">
                         <span class="font-bold m-1">Popular Tags:</span>
@@ -225,31 +272,50 @@ pub fn HomePage(username: crate::auth::UsernameSignal) -> impl IntoView {
 }
 
 #[component]
-fn SearchResults(search_param: RwSignal<String>) -> impl IntoView {
+fn SearchResults(
+    // search_param: RwSignal<String>,
+    run_search: ServerAction<SearchAction>,
+) -> impl IntoView {
     // let results = fetch_results(search.get());
-    let articles_out = LocalResource::new(move || fetch_results(search_param.get()));
+    // let articles_out = LocalResource::new(move || fetch_results(search_param.get()));
+    //
+    let articles_out = run_search.value().get_untracked();
 
     // #[component]
     // fn SearchOut(
     //     article_out: Resource<Result<Vec<crate::models::MatchedArticles>, ServerFnError>>,
     // ) -> impl IntoView {
-    let articles_view = move || {
-        articles_out.with(move |x| {
-            x.clone().map(move |res| {
-                view! {
-                    <Suspense fallback=move || view! { <p>"Loading..."</p> }>
-                        <For
-                            each=move || res.clone().unwrap_or_default().into_iter().enumerate()
-                            key=|(i, _)| *i
-                            children=move |(_, article)| {
-                                view! { <SearchView article_res=article /> }
-                            }
-                        />
-                    </Suspense>
-                }
-            })
-        })
-    };
+    // let articles_view = move || {
+    //     articles_out.with(move |x| {
+    //         x.clone().map(move |res| {
+    //             view! {
+    //                 <Suspense fallback=move || view! { <p>"Loading..."</p> }>
+    //                     <For
+    //                         each=move || res.clone().unwrap_or_default().into_iter().enumerate()
+    //                         key=|(i, _)| *i
+    //                         children=move |(_, article)| {
+    //                             view! { <SearchView article_res=article /> }
+    //                         }
+    //                     />
+    //                 </Suspense>
+    //             }
+    //         })
+    //     })
+    // };
+
+    let articles_view = articles_out.map(move |res| {
+        view! {
+            <Suspense fallback=move || view! { <p>"Loading..."</p> }>
+                <For
+                    each=move || res.clone().unwrap_or_default().into_iter().enumerate()
+                    key=|(i, _)| *i
+                    children=move |(_, article)| {
+                        view! { <SearchView article_res=article /> }
+                    }
+                />
+            </Suspense>
+        }
+    });
     view! {
         <Suspense fallback=move || view! { <p>"Loading Search Articles"</p> }>
             <ErrorBoundary fallback=|_| {
@@ -260,7 +326,7 @@ fn SearchResults(search_param: RwSignal<String>) -> impl IntoView {
 }
 
 #[component]
-fn SearchView(article_res: crate::models::MatchedArticles) -> impl IntoView {
+fn SearchView(article_res: MatchedArticles) -> impl IntoView {
     view! {
         <div class="mb-2 p-4 bg-white rounded-lg shadow-md">
             <p>
@@ -277,9 +343,7 @@ fn SearchView(article_res: crate::models::MatchedArticles) -> impl IntoView {
             </p>
             <div class="flex justify-end">
                 <A href=move || format!("/article/{}", article_res.slug)>
-                    <span class="text-blue-600 underline cursor-pointer">
-                        "Read more..."
-                    </span>
+                    <span class="text-blue-600 underline cursor-pointer">"Read more..."</span>
                 </A>
             </div>
         </div>
@@ -287,31 +351,50 @@ fn SearchView(article_res: crate::models::MatchedArticles) -> impl IntoView {
 }
 
 #[component]
-fn SearchTab(// tab_focus: RwSignal<bool>
-) -> impl IntoView {
+fn SearchArticle(run_search: ServerAction<SearchAction>) -> impl IntoView {
+    // let query = use_query_map();
+    // let run_search = ServerAction::<SearchAction>::new();
+    let search_string: NodeRef<Input> = NodeRef::new();
+    let (search_param, set_search_param) = signal(String::new());
     let global_state = expect_context::<Store<GlobalState>>();
 
-    view! {
-        <button
+    let search_in = move |ev| set_search_param(event_target_value(&ev));
 
-            type="button"
-            on:click=move |_| { global_state.search_window().update(|t| { *t = !*t }) }
-            on:keypress=move |kp| kp.prevent_default()
-            on:keydown=move |kp| kp.prevent_default()
-            on:keyup=move |kp| kp.prevent_default()
-            class=move || {
-                format!(
-                    "px-1 m-1 font-bold {}",
-                    if global_state.search_tab().get() {
-                        "border-b-8 bg-gray-200"
-                    } else {
-                        "bg-gray-200 cursor-pointer"
-                    },
-                )
-            }
-        >
-            "Search"
-        </button>
+    let clear_search = move || {
+        run_search.clear();
+        set_search_param.set(String::new());
+    };
+
+    view! {
+        <ActionForm action=run_search>
+            <div class="flex justify-end">
+                <div class="flex justify-end">
+                    <input
+                        class="shadow appearance-none bg-white border rounded w-full py-1 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        type="text"
+                        name="search"
+                        minlength=2
+                        placeholder="Search string"
+                        required
+                        node_ref=search_string
+                        prop:value=move||search_param.get()
+                        on:input=search_in
+                    />
+                    <button class="absolute pr-2 cursor-pointer hover:text-blue-500 transition duration-200 py-0.5">
+                        <i class="fas fa-magnifying-glass"></i>
+                    </button>
+                </div>
+                // <input class="px-2 cursor-pointer" type="submit" value="Go" />
+                <Show when=move || global_state.search_window().get()>
+                    <button
+                        class="text-blue-400 hover:underline hover:text-blue-500 transition duration-200 cursor-pointer px-2"
+                        on:click=move |_| clear_search()
+                    >
+                        "Clear Search"
+                    </button>
+                </Show>
+            </div>
+        </ActionForm>
     }
 }
 

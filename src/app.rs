@@ -6,7 +6,7 @@ use crate::routes::{
 use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, Body, MetaTags, Stylesheet, Title};
 use leptos_router::{
-    components::{Route, Router, Routes},
+    components::{ParentRoute, Route, Router, Routes},
     path,
 };
 
@@ -127,12 +127,17 @@ pub fn App() -> impl IntoView {
             </nav>
             <main>
                 <Routes fallback=move || "Route Not found.">
-                    <Route
-                        path=path!("/")
-                        view=move || {
-                            view! { <HomeMain username user_profile=false /> }
-                        }
-                    />
+                    // <Route path=path!("/") view=|| view!{ <Redirect path="/home" />} />
+                    // <Route
+                    //     path=path!("/home")
+                    //     view=move || {
+                    //         view! { <HomeMain username user_profile=false /> }
+                    //     }
+                    // />
+                    // <HomeRoutes username/>
+                    <ParentRoute path=path!("") view=move || view! { <HomeMain username user_profile=false /> }>
+                        <Route path=path!("/") view=move|| "search step" />
+                    </ParentRoute>
                     <Route path=path!("/login") view=move || view! { <LoginForm login /> } />
                     <Route path=path!("/reset_password") view=move || view! { <ResetPassword logout/> } />
                     <Route path=path!("/signup") view=move || view! { <SignupForm signup /> } />
@@ -176,6 +181,19 @@ pub fn App() -> impl IntoView {
         </Router>
     }
 }
+
+// #[component(transparent)]
+// pub fn HomeRoutes(
+//     username: RwSignal<Option<String>>,
+// ) -> impl leptos_router::MatchNestedRoutes + Clone {
+//     view! {
+//         <ParentRoute path=path!("") view=move || view! { <HomeMain username user_profile=false /> }>
+//             <Route path=path!("/home") view=|| "Search step" />
+//             // <Route path=path!("") view=|| "route not found" />
+//         </ParentRoute>
+//     }
+//     .into_inner()
+// }
 
 #[component]
 fn EditArticle() -> impl IntoView {
