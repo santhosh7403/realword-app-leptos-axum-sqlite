@@ -1,7 +1,13 @@
 use crate::components::navitems::NavItems;
 use crate::routes::{
-    article_modal::*, editor_modal::*, home_main::*, login_modal::*, reset_password_modal::*,
-    settings_modal::*, signup_modal::*,
+    article_modal::*,
+    editor_modal::*,
+    home_main::*,
+    login_modal::*,
+    reset_password_modal::*,
+    settings_modal::*,
+    signup_modal::*,
+    user_home::{SearchAction, SearchResults},
 };
 use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, Body, MetaTags, Stylesheet, Title};
@@ -45,6 +51,9 @@ pub struct GlobalState {
     home_url: String,
     search_tab: bool,
     search_window: bool,
+    page: i64,
+    amount: i64,
+    search_param: String,
 }
 
 impl Default for GlobalState {
@@ -55,6 +64,9 @@ impl Default for GlobalState {
             home_url: "/".to_string(),
             search_tab: false,
             search_window: false,
+            page: 0,
+            amount: 4,
+            search_param: String::new(),
         }
     }
 }
@@ -102,6 +114,9 @@ pub fn App() -> impl IntoView {
         }
     };
 
+    // let run_search = ServerAction::<SearchAction>::new();
+    // provide_context(run_search);
+
     view! {
         <Stylesheet id="leptos" href="/pkg/realworld-app-leptos-axum-sqlite.css" />
         <Body {..} class=body_class />
@@ -126,34 +141,43 @@ pub fn App() -> impl IntoView {
                 </Transition>
             </nav>
             <main>
+                // <HomeMain username user_profile=false />
                 <Routes fallback=move || "Route Not found.">
-                    // <Route path=path!("/") view=|| view!{ <Redirect path="/home" />} />
+                    <Route
+                        path=path!("/")
+                        view=move || view! { <HomeMain username user_profile=false /> }
+                    />
                     // <Route
-                    //     path=path!("/home")
-                    //     view=move || {
-                    //         view! { <HomeMain username user_profile=false /> }
-                    //     }
+                    // path=path!("/home")
+                    // view=move || {
+                    // view! { <HomeMain username user_profile=false /> }
+                    // }
                     // />
                     // <HomeRoutes username/>
-                    <ParentRoute path=path!("") view=move || view! { <HomeMain username user_profile=false /> }>
-                        <Route path=path!("/") view=move|| "search step" />
-                    </ParentRoute>
+                    // <ParentRoute path=path!("search") view=move || view! { <SearchResults /> }>
+                    // <ParentRoute path=path!("article/:slug") view=move|| view! {<Article username />} />
+                    <Route path=path!("/search") view=move || view! { <SearchResults /> } />
+                    // <Route path=path!("") view=move||view!{"provide an article id"}/>
+                    // </ParentRoute>
+                    // <Route path=path!("") view=move|| view!{} />
+                    // </ParentRoute>
                     <Route path=path!("/login") view=move || view! { <LoginForm login /> } />
-                    <Route path=path!("/reset_password") view=move || view! { <ResetPassword logout/> } />
+                    <Route
+                        path=path!("/reset_password")
+                        view=move || view! { <ResetPassword logout /> }
+                    />
                     <Route path=path!("/signup") view=move || view! { <SignupForm signup /> } />
-                    <Route path=path!("/settings") view=move || view! { <Settings logout/> } />
+                    <Route path=path!("/settings") view=move || view! { <Settings logout /> } />
                     <Route path=path!("/editor") view=|| view! { <Editor /> } />
                     <Route path=path!("/editor/:slug") view=|| view! { <EditArticle /> } />
                     <Route
                         path=path!("/article/:slug")
                         view=move || {
-                            view! {
-                                {
-                                    view! { <Article username /> }
-                                }
-                            }
+
+                            view! { <Article username /> }
                         }
                     />
+
                     <Route
                         path=path!("/profile/:user")
                         view=move || {

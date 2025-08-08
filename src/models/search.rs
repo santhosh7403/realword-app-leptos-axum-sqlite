@@ -1,4 +1,4 @@
-use leptos::prelude::*;
+// use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
@@ -82,7 +82,7 @@ pub struct MatchedArticles {
 
 impl MatchedArticles {
     #[tracing::instrument]
-    // #[cfg(feature = "ssr")]
+    #[cfg(feature = "ssr")]
     pub async fn search_articles(
         query: String,
         page: i64,
@@ -94,9 +94,9 @@ impl MatchedArticles {
             r#"
 SELECT distinct
 a.slug as slug,
-snippet(articles_fts,1, '<span class="bg-yellow-300">','</span>','<span class="bg-blue-200">...</span>',10) as "title: String",
-snippet(articles_fts,2, '<span class="bg-yellow-300">','</span>','<span class="bg-blue-200">...</span>',20) as "description: String",
-snippet(articles_fts,3, '<span class="bg-yellow-300">','</span>','<span class="bg-blue-200">...</span>',20) as "body: String"
+snippet(articles_fts,1, '<span class="bg-yellow-300">','</span>','<span class="bg-yellow-300">  ...  </span>',10) as "title: String",
+snippet(articles_fts,2, '<span class="bg-yellow-300">','</span>','<span class="bg-yellow-300">  ...  </span>',20) as "description: String",
+snippet(articles_fts,3, '<span class="bg-yellow-300">','</span>','<span class="bg-yellow-300">  ...  </span>',20) as "body: String"
 FROM Articles_fts AS AFTS
 JOIN  Articles AS A  ON A.oid = AFTS.rowid
 WHERE Articles_fts MATCH $3
