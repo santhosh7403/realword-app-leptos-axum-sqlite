@@ -12,7 +12,7 @@ use crate::routes::{
 use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, Body, MetaTags, Stylesheet, Title};
 use leptos_router::{
-    components::{ParentRoute, Route, Router, Routes},
+    components::{ParentRoute, Redirect, Route, Router, Routes},
     path,
 };
 
@@ -114,8 +114,8 @@ pub fn App() -> impl IntoView {
         }
     };
 
-    // let run_search = ServerAction::<SearchAction>::new();
-    // provide_context(run_search);
+    let run_search = ServerAction::<SearchAction>::new();
+    provide_context(run_search);
 
     view! {
         <Stylesheet id="leptos" href="/pkg/realworld-app-leptos-axum-sqlite.css" />
@@ -154,12 +154,12 @@ pub fn App() -> impl IntoView {
                     // }
                     // />
                     // <HomeRoutes username/>
-                    // <ParentRoute path=path!("search") view=move || view! { <SearchResults /> }>
-                    // <ParentRoute path=path!("article/:slug") view=move|| view! {<Article username />} />
-                    <Route path=path!("/search") view=move || view! { <SearchResults /> } />
+                    // <ParentRoute path=path!("search") view=move || view! { <SearchResults run_search/> }>
+                    <Route path=path!("article/:slug") view=move|| view! {<Article username />} />
+                    // <Route path=path!("search") view=move || view! { <SearchResults /> } />
                     // <Route path=path!("") view=move||view!{"provide an article id"}/>
                     // </ParentRoute>
-                    // <Route path=path!("") view=move|| view!{} />
+                    // <Route path=path!("") view=move|| view!{<Redirect path="/" />} />
                     // </ParentRoute>
                     <Route path=path!("/login") view=move || view! { <LoginForm login /> } />
                     <Route
@@ -170,13 +170,13 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("/settings") view=move || view! { <Settings logout /> } />
                     <Route path=path!("/editor") view=|| view! { <Editor /> } />
                     <Route path=path!("/editor/:slug") view=|| view! { <EditArticle /> } />
-                    <Route
-                        path=path!("/article/:slug")
-                        view=move || {
+                    // <Route
+                    //     path=path!("/article/:slug")
+                    //     view=move || {
 
-                            view! { <Article username /> }
-                        }
-                    />
+                    //         view! { <Article username /> }
+                    //     }
+                    // />
 
                     <Route
                         path=path!("/profile/:user")
