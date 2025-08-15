@@ -1,18 +1,12 @@
 use crate::components::navitems::NavItems;
 use crate::routes::{
-    article_modal::*,
-    editor_modal::*,
-    home_main::*,
-    login_modal::*,
-    reset_password_modal::*,
-    settings_modal::*,
-    signup_modal::*,
-    user_home::{SearchAction, SearchResults},
+    article_modal::*, editor_modal::*, home_main::*, login_modal::*, reset_password_modal::*,
+    settings_modal::*, signup_modal::*, user_home::SearchAction,
 };
 use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, Body, MetaTags, Stylesheet, Title};
 use leptos_router::{
-    components::{ParentRoute, Redirect, Route, Router, Routes},
+    components::{Route, Router, Routes},
     path,
 };
 
@@ -49,10 +43,10 @@ pub struct GlobalState {
     back_url: String,
     is_profile: bool,
     home_url: String,
-    search_tab: bool,
-    search_window: bool,
-    page: i64,
-    amount: i64,
+    // search_tab: bool,
+    search_results_window: bool,
+    // page: i64,
+    // amount: i64,
     search_param: String,
 }
 
@@ -62,10 +56,10 @@ impl Default for GlobalState {
             back_url: "/".to_string(),
             is_profile: false,
             home_url: "/".to_string(),
-            search_tab: false,
-            search_window: false,
-            page: 0,
-            amount: 4,
+            // search_tab: false,
+            search_results_window: false,
+            // page: 0,
+            // amount: 4,
             search_param: String::new(),
         }
     }

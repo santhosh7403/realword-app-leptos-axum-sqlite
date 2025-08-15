@@ -1,12 +1,9 @@
-use crate::app::{GlobalState, GlobalStateStoreFields};
 use crate::components::article_preview::{ArticleMeta, ArticleSignal};
 use crate::components::user_icons::{AuthorUserIcon, CommentUserIcon, CurrentUserIcon};
 use crate::models::{Comment, User};
 use leptos::html::Textarea;
 use leptos::prelude::*;
 use leptos_meta::Title;
-use leptos_router::hooks::use_params_map;
-use reactive_stores::Store;
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Default)]
 pub struct ArticleResult {
@@ -17,7 +14,7 @@ pub struct ArticleResult {
 #[derive(Clone)]
 pub struct FollowUser(pub bool);
 
-#[server(GetArticleAction, "/api", "GetJson")]
+#[server(ViewArticleAction, "/api", "GetJson")]
 #[tracing::instrument]
 pub async fn get_article(slug: String) -> Result<ArticleResult, ServerFnError> {
     Ok(ArticleResult {
@@ -34,12 +31,11 @@ pub async fn get_article(slug: String) -> Result<ArticleResult, ServerFnError> {
 
 #[tracing::instrument]
 #[component]
-pub fn Article(username: crate::auth::UsernameSignal) -> impl IntoView {
-    let params = use_params_map();
-    let article = Resource::new(
-        move || params().get("slug").unwrap_or_default(),
-        |slug| async { get_article(slug).await },
-    );
+pub fn ArticleView(slug: String, username: crate::auth::UsernameSignal) -> impl IntoView {
+    let article = LocalResource::new(move || {
+        let slug = slug.clone();
+        async { get_article(slug).await }
+    });
 
     let title = RwSignal::new(String::from("Loading"));
 
@@ -76,43 +72,43 @@ fn ArticlePage(username: crate::auth::UsernameSignal, result: ArticleResult) -> 
     let article_signal = RwSignal::new(result.article.clone());
     let user_signal = RwSignal::new(result.logged_user);
 
-    let show_modal: RwSignal<bool> = use_context().expect("show_modal context should be available");
-    show_modal.set(true);
+    // let show_modal: RwSignal<bool> = use_context().expect("show_modal context should be available");
+    // show_modal.set(true);
 
-    let global_state = expect_context::<Store<GlobalState>>();
+    // let global_state = expect_context::<Store<GlobalState>>();
 
-    let on_back_event = move || {
-        show_modal.set(false);
-        let navigate = leptos_router::hooks::use_navigate();
-        let url_str = global_state.back_url().get().to_string();
-        navigate(&url_str, Default::default());
-        // global_state.search_window().set(false);
-    };
+    // let on_back_event = move || {
+    //     show_modal.set(false);
+    //     let navigate = leptos_router::hooks::use_navigate();
+    //     let url_str = global_state.back_url().get().to_string();
+    //     navigate(&url_str, Default::default());
+    // };
 
     let following_signal =
         RwSignal::new(FollowUser(article_signal.get_untracked().author.following));
     provide_context(following_signal);
 
     view! {
-        <Show when=move || show_modal.get()>
-            <ArticlePageModal on_back_event username article_signal user_signal/>
-        </Show>
+        // <Show when=move || show_modal.get()>
+            <ArticlePageModal username article_signal user_signal/>
+            // <ArticlePageModal on_back_event username article_signal user_signal />
+        // </Show>
     }
 }
 
 #[component]
-pub fn ArticlePageModal<C>(
-    on_back_event: C,
+pub fn ArticlePageModal(
+    // on_back_event: C,
     username: crate::auth::UsernameSignal,
     article_signal: ArticleSignal,
     user_signal: RwSignal<Option<User>>,
 ) -> impl IntoView
-where
-    C: Fn() + 'static + Copy,
+// where
+//     C: Fn() + 'static + Copy,
 {
     view! {
-        <div class="bg-opacity-60 inset-0 z-50 flex items-center justify-center">
-            <div class="z-70 block w-4/5 rounded-lg bg-white p-4 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
+        <div class="bg-opacity-60 inset-0 flex items-center justify-center">
+            <div class="block w-4/5 rounded-lg bg-white p-4 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
                 <div class="mb-5 px-1 py-1">
                     <div class="mb-5">
                         <ArticleMeta username article=article_signal is_preview=false />
@@ -126,9 +122,9 @@ where
                             </div>
                             <AuthorUserIcon article_signal />
                         </div>
-                        <div>
-                            <BackToButton on_back_event is_top=true/>
-                        </div>
+                        // <div>
+                        //     <BackToButton on_back_event is_top=true/>
+                        // </div>
                     </div>
                     <div class="mb-5">
                         <p>{article_signal.get_untracked().body}</p>
@@ -137,32 +133,32 @@ where
                 <div class="mb-5 px-1 py-1">
                     <CommentSection username article=article_signal user_signal />
                 </div>
-                    <BackToButton on_back_event is_top=false/>
+                    // <BackToButton on_back_event is_top=false/>
             </div>
         </div>
     }
 }
 
-#[component]
-fn BackToButton<C>(on_back_event: C, is_top: bool) -> impl IntoView
-where
-    C: Fn() + 'static + Clone,
-{
-    view! {
-        <form>
-            <div class="flex justify-end mb-5">
-                <button
-                    type="cancel"
-                    class=move||{format!("fixed bg-blue-700 hover:bg-blue-800 px-15 py-3 text-white font-semibold rounded-lg transition-colors duration-300 {}", if is_top {"top-0 left-0"}else{"bottom-4 right-4"})}
-                    on:click=move |_| on_back_event()
-                >
-                    Back
-                </button>
+// #[component]
+// fn BackToButton<C>(on_back_event: C, is_top: bool) -> impl IntoView
+// where
+//     C: Fn() + 'static + Clone,
+// {
+//     view! {
+//         <form>
+//             <div class="flex justify-end mb-5">
+//                 <button
+//                     type="cancel"
+//                     class=move||{format!("fixed bg-blue-700 hover:bg-blue-800 px-15 py-3 text-white font-semibold rounded-lg transition-colors duration-300 {}", if is_top {"top-0 left-0"}else{"bottom-4 right-4"})}
+//                     on:click=move |_| on_back_event()
+//                 >
+//                     Back
+//                 </button>
 
-            </div>
-        </form>
-    }
-}
+//             </div>
+//         </form>
+//     }
+// }
 
 #[server(PostCommentAction, "/api")]
 #[tracing::instrument]
