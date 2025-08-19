@@ -8,13 +8,6 @@ use reactive_stores::Store;
 use std::env;
 
 #[allow(dead_code)]
-mod mailer_constants {
-    pub const MAILER_EMAIL: &str = "m@example.com";
-    pub const MAILER_PASSWD: &str = "yourpassword";
-    pub const MAILER_SMTP_SERVER: &str = "your-smtp-mail.com";
-}
-
-#[allow(dead_code)]
 #[cfg(feature = "ssr")]
 struct EmailCredentials {
     email: String,
@@ -34,9 +27,9 @@ pub async fn reset_password_1(email: String) -> Result<String, ServerFnError> {
         return Err(ServerFnError::new(err));
     } else {
         let creds = EMAIL_CREDS.get_or_init(|| EmailCredentials {
-            email: mailer_constants::MAILER_EMAIL.to_string(),
-            passwd: mailer_constants::MAILER_PASSWD.to_string(),
-            smtp_server: mailer_constants::MAILER_SMTP_SERVER.to_string(),
+            email: env::var("MAILER_EMAIL").unwrap(),
+            passwd: env::var("MAILER_PASSWD").unwrap(),
+            smtp_server: env::var("MAILER_SMTP_SERVER").unwrap(),
         });
         let host = leptos_axum::extract::<axum_extra::extract::Host>().await?.0;
         let schema = if cfg!(debug_assertions) {

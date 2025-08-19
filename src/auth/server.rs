@@ -7,7 +7,6 @@ use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 
 static AUTH_COOKIE: &str = "token";
-const JWT_SECRET: &str = "hello darkness my old friend";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenClaims {
@@ -67,8 +66,7 @@ async fn redirect(req: Request<axum::body::Body>, next: axum::middleware::Next) 
 pub(crate) fn decode_token(
     token: &str,
 ) -> Result<jsonwebtoken::TokenData<TokenClaims>, jsonwebtoken::errors::Error> {
-    // let secret = env!("JWT_SECRET");
-    let secret = JWT_SECRET;
+    let secret = env!("JWT_SECRET");
 
     decode::<TokenClaims>(
         token,
@@ -78,8 +76,7 @@ pub(crate) fn decode_token(
 }
 
 pub(crate) fn encode_token(token_claims: TokenClaims) -> jsonwebtoken::errors::Result<String> {
-    // let secret = env!("JWT_SECRET");
-    let secret = JWT_SECRET;
+    let secret = env!("JWT_SECRET");
 
     jsonwebtoken::encode(
         &jsonwebtoken::Header::default(),

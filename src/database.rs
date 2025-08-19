@@ -1,9 +1,10 @@
 static DB: std::sync::OnceLock<sqlx::SqlitePool> = std::sync::OnceLock::new();
 
 async fn create_pool() -> sqlx::SqlitePool {
+    let database_url = std::env::var("DATABASE_URL").expect("no database url found in ENV vars");
     let pool = sqlx::sqlite::SqlitePoolOptions::new()
         .max_connections(8)
-        .connect("sqlite://realworld-app-leptos.db")
+        .connect(database_url.as_str())
         .await
         .expect("could not connect to database");
 
