@@ -136,8 +136,6 @@ pub async fn fetch_results(
         .await.map_err(|e| ServerFnError::new(format!("Some problem occured in sqlite query - {}", e.to_string())))
         ;
 
-        leptos::logging::log!("search count is {}", total.clone().unwrap());
-
         Ok((
             (total.unwrap_or_default(), page, amount),
             crate::models::MatchedArticles::search_articles(search, page, amount)
@@ -294,7 +292,6 @@ pub fn SearchResults(
             x.clone().map(move |res| {
                 let (total_count, page, amount) = if let Some(Ok((t, _))) = res { t } else { (0, 0, 0) };
                 if total_count>0 {
-                    leptos::logging::log!("setting search_results_window to true");
                     global_state.search_results_window().set(true)}else{global_state.search_results_window().set(false)}
                 res.map(|res|{
 
