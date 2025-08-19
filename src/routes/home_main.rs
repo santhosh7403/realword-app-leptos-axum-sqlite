@@ -10,13 +10,6 @@ pub fn HomeMain(username: crate::auth::UsernameSignal, user_profile: bool) -> im
 
     view! {
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 bg-gray-200 px-2 py-2 sm:px-0">
-            // <Show when=move || global_state.search_window().get()>
-                //  <Outlet />
-            // </Show>
-            // <Show when=move || {
-            //     leptos::logging::log!("search_window is  {}", global_state.search_window().get());
-            //     !global_state.search_window().get()
-            // }>
                 <Show
                     when=move || !user_profile
                     fallback=move || {
@@ -32,7 +25,6 @@ pub fn HomeMain(username: crate::auth::UsernameSignal, user_profile: bool) -> im
                         <HomePage username />
                     </Suspense>
                 </Show>
-            // </Show>
         </div>
     }
 }

@@ -86,7 +86,6 @@ fn ArticlePage(username: crate::auth::UsernameSignal, result: ArticleResult) -> 
         let navigate = leptos_router::hooks::use_navigate();
         let url_str = global_state.back_url().get().to_string();
         navigate(&url_str, Default::default());
-        // global_state.search_window().set(false);
     };
 
     let following_signal =
