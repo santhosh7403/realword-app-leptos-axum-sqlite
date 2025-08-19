@@ -10,8 +10,8 @@ use reactive_stores::Store;
 
 #[derive(serde::Deserialize, serde::Serialize, Clone, Default)]
 pub struct ArticleResult {
-    pub(super) article: crate::models::Article,
-    pub(super) logged_user: Option<crate::models::User>,
+    pub article: crate::models::Article,
+    pub logged_user: Option<crate::models::User>,
 }
 
 #[derive(Clone)]
@@ -209,7 +209,7 @@ pub async fn delete_comment(id: i32) -> Result<(), ServerFnError> {
 }
 
 #[component]
-fn CommentSection(
+pub fn CommentSection(
     username: crate::auth::UsernameSignal,
     article: ArticleSignal,
     user_signal: RwSignal<Option<crate::models::User>>,

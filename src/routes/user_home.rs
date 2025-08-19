@@ -4,11 +4,11 @@ use crate::models::Pagination;
 use leptos::{html::Input, prelude::*};
 use leptos_meta::*;
 use leptos_router::{
+    components::A,
     hooks::{use_location, use_query},
     params::ParamsError,
 };
 use reactive_stores::Store;
-// use serde::{Deserialize, Serialize};
 
 use crate::components::{
     article_preview::ArticlePreviewList, items_per_page::ItemsPerPage,
@@ -38,23 +38,85 @@ async fn home_articles(
 
 #[server(GetTagsAction, "/api", "GetJson")]
 async fn get_tags() -> Result<Vec<String>, ServerFnError> {
-    sqlx::query!("SELECT DISTINCT tag FROM ArticleTags")
-        .map(|x| x.tag)
-        .fetch_all(crate::database::get_db())
-        .await
-        .map_err(|x| {
-            tracing::error!("problem while fetching tags: {x:?}");
-            ServerFnError::ServerError("Problem while fetching tags".into())
-        })
-}
+    // sqlx::query!("SELECT DISTINCT tag FROM ArticleTags")
+    sqlx::query!(
+        // "SELECT
+        //     T1.tag As tag,
+        //     COUNT(T1.article) AS tag_count,
+        //     MAX(T2.created_at) AS max_created_at
+        // FROM
+        //     ArticleTags AS T1
+        // JOIN
+        //     Articles AS T2
+        // ON
+        //     T1.article = T2.slug
+        // GROUP BY
+        //     T1.tag
+        // ORDER BY
+        //     max_created_at DESC,
+        //     tag_count DESC
+        // LIMIT 10"
+        "
+            SELECT
+                tag,
+                tag_count,
+                max_created_at
+            FROM (
+                SELECT
+                    T1.tag,
+                    COUNT(T1.article) AS tag_count,
+                    MAX(T2.created_at) AS max_created_at
+                FROM
+                    ArticleTags AS T1
+                JOIN
+                    Articles AS T2
+                ON
+                    T1.article = T2.slug
+                GROUP BY
+                    T1.tag
+            	ORDER BY  
+            		tag_count DESC
+            	LIMIT 10
+            ) AS combined_tags
 
-// #[derive(Serialize, Deserialize, Clone, Default, Debug)]
-// pub struct MatchedArticles {
-//     pub slug: String,
-//     pub title: Option<String>,
-//     pub description: Option<String>,
-//     pub body: Option<String>,
-// }
+            UNION 
+
+            SELECT
+                tag,
+                tag_count,
+                max_created_at
+            FROM (
+                SELECT
+                    T1.tag,
+                    COUNT(T1.article) AS tag_count,
+                    MAX(T2.created_at) AS max_created_at
+                FROM
+                    ArticleTags AS T1
+                JOIN
+                    Articles AS T2
+                ON
+                    T1.article = T2.slug
+                GROUP BY
+                    T1.tag
+                ORDER BY
+                    max_created_at DESC
+                LIMIT 10
+            ) AS combined_tags
+        "
+    )
+    .map(|x| x.tag)
+    .fetch_all(crate::database::get_db())
+    .await
+    .map(|tags| {
+        tags.into_iter()
+            .filter_map(|tag| tag)
+            .collect::<Vec<String>>()
+    })
+    .map_err(|x| {
+        tracing::error!("problem while fetching tags: {x:?}");
+        ServerFnError::ServerError("Problem while fetching tags".into())
+    })
+}
 
 #[server(SearchAction)]
 pub async fn fetch_results(
@@ -62,9 +124,6 @@ pub async fn fetch_results(
     page: i64,
     amount: i64,
 ) -> Result<((i64, i64, i64), Vec<crate::models::MatchedArticles>), ServerFnError> {
-    // let page = 0;
-    // let amount = 10;
-    // let offset = page * amount;
     if search.is_empty() {
         Err(ServerFnError::new("Empty search string, hence ignore"))
     } else {
@@ -87,32 +146,6 @@ pub async fn fetch_results(
                     tracing::error!("problem while fetching search articles: {x:?}");
                     ServerFnError::new("Problem while fetching search articles")
                 })?,
-            //     sqlx::query!(
-            //             // MatchedArticles,
-            //             r#"
-            // SELECT distinct
-            // a.slug as slug,
-            // snippet(articles_fts,1, '<span class="bg-yellow-300">','</span>','<span class="bg-yellow-300">  ...  </span>',10) as "title: String",
-            // snippet(articles_fts,2, '<span class="bg-yellow-300">','</span>','<span class="bg-yellow-300">  ...  </span>',20) as "description: String",
-            // snippet(articles_fts,3, '<span class="bg-yellow-300">','</span>','<span class="bg-yellow-300">  ...  </span>',20) as "body: String"
-            // FROM Articles_fts AS AFTS
-            // JOIN  Articles AS A  ON A.oid = AFTS.rowid
-            // WHERE Articles_fts MATCH $3
-            // order by rank
-            // LIMIT $1 OFFSET $2"#,
-            //             amount,
-            //             offset,
-            //             search,
-            //         )
-            //         .map(|x| MatchedArticles {
-            //             slug: x.slug,
-            //             title: x.title,
-            //             description: x.description,
-            //             body: x.body,
-            //         })
-            //         .fetch_all(crate::database::get_db())
-            //         .await
-            //         .map_err(|e| ServerFnError::new(format!("Some problem occured in sqlite query - {}", e.to_string())))
         ))
     }
 }
@@ -186,57 +219,55 @@ pub fn HomePage(username: crate::auth::UsernameSignal) -> impl IntoView {
                     <ItemsPerPage />
                 </div>
                 <SearchResults run_search username />
-                // </Show>
-                <Show when=move || !pagination.get().unwrap_or_default().get_my_feed()>
-                    <div class="flex gap-1 rounded bg-white mb-2">
-                        <span class="font-bold m-1">Popular Tags:</span>
-                        <TagList />
-                    </div>
-                </Show>
-                <Show
-                    when=move || {
-                        articles
-                            .with(|x| {
-                                x.as_ref()
-                                    .map_or(0, |y| y.as_ref().map(Vec::len).unwrap_or_default())
-                            }) != 0
-                    }
-                    fallback=move || {
-                        view! {
-                            <div>
-                                <p>
-                                    {if pagination.get().unwrap_or_default().get_my_feed() {
-                                        "You are not following any other user!"
-                                    } else {
-                                        "No articles to list"
-                                    }}
-                                </p>
-                            </div>
+                <Show when=move || !global_state.search_results_window().get()>
+                    <Show when=move || !pagination.get().unwrap_or_default().get_my_feed()>
+                        <div class="flex gap-1 rounded bg-white mb-2">
+                            <span class="font-bold m-1">Popular Tags:</span>
+                            <TagList />
+                        </div>
+                    </Show>
+                    <Show
+                        when=move || {
+                            articles
+                                .with(|x| {
+                                    x.as_ref()
+                                        .map_or(0, |y| y.as_ref().map(Vec::len).unwrap_or_default())
+                                }) != 0
                         }
-                    }
-                >
-                    <Suspense fallback=move || view! { <p>"Loading..."</p> }>
-                        <ArticlePreviewList username articles />
-                    </Suspense>
+                        fallback=move || {
+                            view! {
+                                <div>
+                                    <p>
+                                        {if pagination.get().unwrap_or_default().get_my_feed() {
+                                            "You are not following any other user!"
+                                        } else {
+                                            "No articles to list"
+                                        }}
+                                    </p>
+                                </div>
+                            }
+                        }
+                    >
+                        <Suspense fallback=move || view! { <p>"Loading..."</p> }>
+                            <ArticlePreviewList username articles />
+                        </Suspense>
+                    </Show>
                 </Show>
             </div>
-            <div class="flex gap-4">
-                <PreviousNextButton articles />
-            </div>
+            <Show when=move || !global_state.search_results_window().get()>
+                <div class="flex gap-4">
+                    <PreviousNextButton articles />
+                </div>
+            </Show>
         </div>
     }
 }
 
 #[component]
 pub fn SearchResults(
-    // search_param: RwSignal<String>,
     run_search: ServerAction<SearchAction>,
     username: crate::auth::UsernameSignal,
 ) -> impl IntoView {
-    // let results = fetch_results(search.get());
-    // let articles_out = LocalResource::new(move || fetch_results(search_param.get()));
-    //
-    // let articles_out = run_search.value().get_untracked();
     let global_state = expect_context::<Store<GlobalState>>();
 
     let articles_out = Resource::new(
@@ -245,7 +276,7 @@ pub fn SearchResults(
                 run_search.version().get(),
                 global_state.search_results_window().get(),
             )
-        }, // global_state.search_results_window().get()
+        },
         move |_| async move { run_search.value().get_untracked() },
     );
 
@@ -255,12 +286,13 @@ pub fn SearchResults(
         run_search.clear();
     };
 
+    let open_article_cnt = RwSignal::new(0);
+    let hide_all = RwSignal::new(false);
+
     let articles_view = move || {
         articles_out.with(move |x| {
             x.clone().map(move |res| {
                 let (total_count, page, amount) = if let Some(Ok((t, _))) = res { t } else { (0, 0, 0) };
-                // let (total_count, page, amount) = if let Ok((t, _)) = res { t } else { (0, 0, 0) };
-    // let articles_view = articles_out.map(move|res|{
                 if total_count>0 {
                     leptos::logging::log!("setting search_results_window to true");
                     global_state.search_results_window().set(true)}else{global_state.search_results_window().set(false)}
@@ -270,7 +302,6 @@ pub fn SearchResults(
                     <Suspense fallback=move || {
                         view! { <p>"Loading..."</p> }
                     }>
-                        // <Show when=move || (total_count > (page * amount))>
                         <Show when=move || global_state.search_results_window().get()>
                             <div class="flex justify-between mb-1">
                                 <div class="font-bold">"Search results = "{total_count}</div>
@@ -282,20 +313,8 @@ pub fn SearchResults(
                                         {match page {
                                             0 => 1,
                                             _ => page * amount + 1,
-                                        }}// if page == 0 { 1 } else { page * amount + 1 }
-
-                                        " to " // if page == 0 && total_count < amount {
-                                        // total_count
-                                        {// } else if page == 0 {
-                                        // amount
-                                        // } else {
-                                        // if( (page+1) * amount) < total_count {
-                                        // (page+1) * amount
-                                        // }else {
-                                        // total_count
-                                        // }
-                                        // }
-                                        match (page, total_count < amount) {
+                                        }} " to "
+                                        {match (page, total_count < amount) {
                                             (0, true) => total_count,
                                             (0, false) => amount,
                                             (_, _) => std::cmp::min((page + 1) * amount, total_count),
@@ -308,47 +327,10 @@ pub fn SearchResults(
                                         </button>
                                     </Show>
                                 </div>
-                                <div class="flex gap-2">
-                                    <Show when=move || { page > 0 }>
-                                        <div>
-                                            <ActionForm action=run_search>
-                                                <input
-                                                    type="hidden"
-                                                    name="search"
-                                                    value=move || { global_state.search_param().get() }
-                                                />
-                                                <input type="hidden" name="page" value=move || page - 1 />
-                                                <input type="hidden" name="amount" value=move || amount />
-                                                <button class="px-4 cursor-pointer rounded-full border hover:text-blue-500">
-                                                    "Prev page"
-                                                </button>
-                                            </ActionForm>
-                                        </div>
-
-                                    </Show>
-
-                                    <Show when=move || {
-                                        match page {
-                                            0 => total_count > amount,
-                                            _ => total_count > ((page + 1) * amount),
-                                        }
-                                    }>
-                                        <div>
-                                            <ActionForm action=run_search>
-                                                <input
-                                                    type="hidden"
-                                                    name="search"
-                                                    value=move || { global_state.search_param().get() }
-                                                />
-                                                <input type="hidden" name="page" value=move || page + 1 />
-                                                <input type="hidden" name="amount" value=move || amount />
-                                                <button class="px-4 cursor-pointer rounded-full border hover:text-blue-500">
-                                                    "Next page"
-                                                </button>
-                                            </ActionForm>
-                                        </div>
-                                    </Show>
-                                </div>
+                                <ResultsViewPrevNextButton
+                                    run_search
+                                    page_data=(total_count, page, amount)
+                                />
                             </div>
                         </Show>
 
@@ -356,8 +338,19 @@ pub fn SearchResults(
                             each=move || res.clone().unwrap_or_default().1.into_iter().enumerate()
                             key=|(i, _)| *i
                             children=move |(_, article)| {
-                                view! { <SearchView article_res=article username /> }
+                                view! {
+                                    <SearchView
+                                        article_res=article
+                                        username
+                                        open_article_cnt
+                                        hide_all
+                                    />
+                                }
                             }
+                        />
+                        <ResultsViewPrevNextButton
+                            run_search
+                            page_data=(total_count, page, amount)
                         />
                     </Suspense>
                 }
@@ -375,11 +368,72 @@ pub fn SearchResults(
 }
 
 #[component]
+fn ResultsViewPrevNextButton(
+    run_search: ServerAction<SearchAction>,
+    page_data: (i64, i64, i64),
+) -> impl IntoView {
+    let global_state = expect_context::<Store<GlobalState>>();
+
+    let (total_count, page, amount) = page_data;
+
+    view! {
+        <div class="flex gap-2 justify-end">
+            <Show when=move || { page > 0 }>
+                <div>
+                    <ActionForm action=run_search>
+                        <input
+                            type="hidden"
+                            name="search"
+                            value=move || { global_state.search_param().get() }
+                        />
+                        <input type="hidden" name="page" value=move || page - 1 />
+                        <input type="hidden" name="amount" value=move || amount />
+                        <button class="px-4 cursor-pointer rounded-full border hover:text-blue-500">
+                            "Prev page"
+                        </button>
+                    </ActionForm>
+                </div>
+
+            </Show>
+
+            <Show when=move || {
+                match page {
+                    0 => total_count > amount,
+                    _ => total_count > ((page + 1) * amount),
+                }
+            }>
+                <div>
+                    <ActionForm action=run_search>
+                        <input
+                            type="hidden"
+                            name="search"
+                            value=move || { global_state.search_param().get() }
+                        />
+                        <input type="hidden" name="page" value=move || page + 1 />
+                        <input type="hidden" name="amount" value=move || amount />
+                        <button class="px-4 cursor-pointer rounded-full border hover:text-blue-500">
+                            "Next page"
+                        </button>
+                    </ActionForm>
+                </div>
+            </Show>
+        </div>
+    }
+}
+
+#[component]
 fn SearchView(
     article_res: crate::models::MatchedArticles,
     username: crate::auth::UsernameSignal,
+    open_article_cnt: RwSignal<i32>,
+    hide_all: RwSignal<bool>,
 ) -> impl IntoView {
     let (show_article, set_show_article) = signal(false);
+    let reset_show_article = move || {
+        if hide_all.get() {
+            set_show_article.set(false);
+        }
+    };
 
     view! {
         <div class="mb-2 p-4 bg-white rounded-lg shadow-md">
@@ -395,19 +449,57 @@ fn SearchView(
                 <span class="font-bold">"Body: "</span>
                 <span inner_html=article_res.body></span>
             </p>
-            <div class="flex justify-end">
-                <button
-                    class="text-blue-600 underline cursor-pointer"
-                    type="button"
-                    on:click=move |_| set_show_article.set(!show_article.get())
-                >
-                    {move || {
-                        format!("{}", if show_article.get() { "Hide" } else { "Show Full Article" })
-                    }}
-                </button>
+            <div class="flex justify-between">
+                <div>
+                    <A
+                        href=format!("/article/{}", article_res.slug.clone())
+                        target="_blank"
+                        attr:class="text-blue-600 underline cursor-pointer"
+                    >
+                        "Open in a new tab/window"
+                    </A>
+                </div>
+                <div>
+                    <button
+                        class="text-blue-600 underline cursor-pointer"
+                        type="button"
+                        on:click=move |_| {
+                            set_show_article.set(!show_article.get());
+                            match show_article.get() {
+                                true => {
+                                    open_article_cnt.update(|cnt| *cnt = *cnt + 1);
+                                    hide_all.update(|h| *h = false)
+                                }
+                                false => open_article_cnt.update(|cnt| *cnt = *cnt - 1),
+                            }
+                        }
+                    >
+                        {move || {
+                            reset_show_article();
+                            format!(
+                                "{}",
+                                if show_article.get() { "Hide" } else { "Show Full Article" },
+                            )
+                        }}
+                    </button>
+                    <div>
+                        <Show when=move || (open_article_cnt.get() > 1 && show_article.get())>
+                            <button
+                                class="text-blue-600 underline cursor-pointer"
+                                type="button"
+                                on:click=move |_| {
+                                    hide_all.update(|h| *h = true);
+                                    open_article_cnt.update(|cnt| *cnt = 0);
+                                }
+                            >
+                                "Hide All"
+                            </button>
+                        </Show>
+                    </div>
+                </div>
 
             </div>
-            <Show when=move || show_article.get() fallback=|| ()>
+            <Show when=move || (show_article.get() && !hide_all.get()) fallback=|| ()>
                 <ArticleView slug=article_res.slug.clone() username />
             </Show>
         </div>
@@ -461,7 +553,9 @@ fn YourFeedTab(
     view! {
         <button
             type="button"
-            disabled=move || username.with(Option::is_none)
+            disabled=move || {
+                username.with(Option::is_none) || global_state.search_results_window().get()
+            }
             on:click=move |_| {
                 let navigate = leptos_router::hooks::use_navigate();
                 let your_feed_url = format!(
@@ -490,7 +584,7 @@ fn YourFeedTab(
             }
             class=move || {
                 format!(
-                    "px-1 m-1 font-bold {}",
+                    "px-1 m-1 font-bold disabled:cursor-not-allowed {}",
                     if username.with(Option::is_none) {
                         "cursor-not-allowed bg-gray-200"
                     } else if pagination
@@ -520,9 +614,10 @@ fn GlobalFeedTab(pagination: Memo<Result<Pagination, ParamsError>>) -> impl Into
 
     view! {
         <button
+            disabled=move || global_state.search_results_window().get()
             class=move || {
                 format!(
-                    "px-1 m-1 font-bold {}",
+                    "px-1 m-1 font-bold disabled:cursor-not-allowed {}",
                     if !pagination
                         .with(|x| {
                             x.as_ref()

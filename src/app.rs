@@ -43,10 +43,7 @@ pub struct GlobalState {
     back_url: String,
     is_profile: bool,
     home_url: String,
-    // search_tab: bool,
     search_results_window: bool,
-    // page: i64,
-    // amount: i64,
     search_param: String,
 }
 
@@ -56,10 +53,7 @@ impl Default for GlobalState {
             back_url: "/".to_string(),
             is_profile: false,
             home_url: "/".to_string(),
-            // search_tab: false,
             search_results_window: false,
-            // page: 0,
-            // amount: 4,
             search_param: String::new(),
         }
     }
@@ -108,6 +102,14 @@ pub fn App() -> impl IntoView {
         }
     };
 
+    let footer_class = move || {
+        if show_modal.get() {
+            "hidden"
+        } else {
+            "bg-gray-200 text-gray-600 text-center text-xs sticky bottom-0"
+        }
+    };
+
     let run_search = ServerAction::<SearchAction>::new();
     provide_context(run_search);
 
@@ -135,26 +137,12 @@ pub fn App() -> impl IntoView {
                 </Transition>
             </nav>
             <main>
-                // <HomeMain username user_profile=false />
                 <Routes fallback=move || "Route Not found.">
                     <Route
                         path=path!("/")
                         view=move || view! { <HomeMain username user_profile=false /> }
                     />
-                    // <Route
-                    // path=path!("/home")
-                    // view=move || {
-                    // view! { <HomeMain username user_profile=false /> }
-                    // }
-                    // />
-                    // <HomeRoutes username/>
-                    // <ParentRoute path=path!("search") view=move || view! { <SearchResults run_search/> }>
                     <Route path=path!("article/:slug") view=move|| view! {<Article username />} />
-                    // <Route path=path!("search") view=move || view! { <SearchResults /> } />
-                    // <Route path=path!("") view=move||view!{"provide an article id"}/>
-                    // </ParentRoute>
-                    // <Route path=path!("") view=move|| view!{<Redirect path="/" />} />
-                    // </ParentRoute>
                     <Route path=path!("/login") view=move || view! { <LoginForm login /> } />
                     <Route
                         path=path!("/reset_password")
@@ -164,14 +152,6 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("/settings") view=move || view! { <Settings logout /> } />
                     <Route path=path!("/editor") view=|| view! { <Editor /> } />
                     <Route path=path!("/editor/:slug") view=|| view! { <EditArticle /> } />
-                    // <Route
-                    //     path=path!("/article/:slug")
-                    //     view=move || {
-
-                    //         view! { <Article username /> }
-                    //     }
-                    // />
-
                     <Route
                         path=path!("/profile/:user")
                         view=move || {
@@ -180,16 +160,21 @@ pub fn App() -> impl IntoView {
                     />
                 </Routes>
             </main>
-            <footer class=move || {
-                format!(
-                    "{}",
-                    if show_modal.get() {
-                        "hidden"
-                    } else {
-                        "bg-gray-200 text-gray-600 text-center text-xs sticky bottom-0"
-                    },
-                )
-            }>
+            <footer class=footer_class
+
+            // move || {
+
+            //     leptos::logging::log!("show_modal is {}", show_modal.get());
+            //     format!(
+            //         "{}",
+            //         if show_modal.get() {
+            //             "hidden"
+            //         } else {
+            //             ""
+            //         },
+            //     )
+            // }
+            >
 
                 <a href="/">"MyApp"</a>
                 <div class="">
@@ -199,19 +184,6 @@ pub fn App() -> impl IntoView {
         </Router>
     }
 }
-
-// #[component(transparent)]
-// pub fn HomeRoutes(
-//     username: RwSignal<Option<String>>,
-// ) -> impl leptos_router::MatchNestedRoutes + Clone {
-//     view! {
-//         <ParentRoute path=path!("") view=move || view! { <HomeMain username user_profile=false /> }>
-//             <Route path=path!("/home") view=|| "Search step" />
-//             // <Route path=path!("") view=|| "route not found" />
-//         </ParentRoute>
-//     }
-//     .into_inner()
-// }
 
 #[component]
 fn EditArticle() -> impl IntoView {
