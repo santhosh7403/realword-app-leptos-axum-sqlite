@@ -13,7 +13,7 @@ To make it run in few simple steps, made a sqlite version (though, [ recent opin
 
 Before proceeding to clone, you may take a look on the [ screenshots here ](https://github.com/santhosh7403/realword-app-leptos-axum-sqlite/blob/main/App_Screenshots.md), that will give a quick good insight into this app and you can decide.
 
-There is a Postgres version of this (without full-text-search, for now) as well and you can [ find it here ](https://github.com/santhosh7403/realword-app-leptos-axum).
+There is a Postgres version of this (full-text-search had slight differences, though) as well and you can [ find it here ](https://github.com/santhosh7403/realword-app-leptos-axum).
 
 This app includes:<br/>
         Leptos<br/>
@@ -69,6 +69,9 @@ More screenshots are [ available here ](https://github.com/santhosh7403/realword
 
 To showcase the app and test, some sample users and data are populated. User names 'user1' to 'user5' are available and password is same as username. In case if you want to remove this data, you may delete the 'basedata' files inside migrations folder and setup database as explained in [ database readme ](https://github.com/santhosh7403/realword-app-leptos-axum-sqlite/blob/main/README_DATABASE.md).
 
+# Sqlite fts5 (full-text search)
+
+The full-text search feature added covers three fields from articles table. If you are interested to learn how it works or want to experiment different search methods, please refer the sqlite fts5 documentation [ here ](https://www.sqlite.org/fts5.html#overview_of_fts5)
 
 # Inspiration and Thanks
 
