@@ -496,7 +496,7 @@ fn SearchView(
                 </div>
 
             </div>
-            <Show when=move || (show_article.get() && !hide_all.get()) fallback=|| ()>
+            <Show when=move || show_article.get() && !hide_all.get()  fallback=|| ()>
                 <ArticleView slug=article_res.slug.clone() username />
             </Show>
         </div>

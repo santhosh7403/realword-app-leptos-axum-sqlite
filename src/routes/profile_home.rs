@@ -273,7 +273,7 @@ where
 {
     let params = use_params_map();
     let resource = Resource::new(
-        move || (params.with(|x| x.get("user").clone().unwrap_or_default())),
+        move || params.with(|x| x.get("user").clone().unwrap_or_default()),
         move |user| async move { user_profile(user).await },
     );
 
