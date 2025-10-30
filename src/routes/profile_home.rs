@@ -78,7 +78,7 @@ pub async fn user_profile(username: String) -> Result<UserProfileModel, ServerFn
 pub fn Profile(username: crate::auth::UsernameSignal) -> impl IntoView {
     let params = use_params_map();
 
-    let route_user = move || params.with_untracked(|x| x.get("user").unwrap_or_default());
+    let route_user = move || params.with(|x| x.get("user").unwrap_or_default());
     // let (route_user, set_route_user) = signal(String::new());
     // Effect::new(move || set_route_user(params.with(|x| x.get("user").unwrap_or_default())));
 
