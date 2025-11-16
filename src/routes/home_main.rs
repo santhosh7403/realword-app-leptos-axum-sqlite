@@ -9,22 +9,22 @@ pub fn HomeMain(username: crate::auth::UsernameSignal, user_profile: bool) -> im
     tracing::debug!("Starting HomePage component");
 
     view! {
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 bg-gray-200 px-2 py-2 sm:px-0">
-                <Show
-                    when=move || !user_profile
-                    fallback=move || {
-                        view! {
-                            <Transition fallback=move || view! { <p>"Loading data..."</p> }>
-                                <Profile username />
-                            </Transition>
-                        }
+        <div class="mx-auto sm:px-6 lg:px-8 bg-gray-200 px-2 py-2">
+            <Show
+                when=move || !user_profile
+                fallback=move || {
+                    view! {
+                        <Transition fallback=move || view! { <p>"Loading data..."</p> }>
+                            <Profile username />
+                        </Transition>
                     }
-                >
-                    <Suspense fallback=move || view! { <p>"Loading..."</p> }>
-                        <Title text="Home" />
-                        <HomePage username />
-                    </Suspense>
-                </Show>
+                }
+            >
+                <Suspense fallback=move || view! { <p>"Loading..."</p> }>
+                    <Title text="Home" />
+                    <HomePage username />
+                </Suspense>
+            </Show>
         </div>
     }
 }

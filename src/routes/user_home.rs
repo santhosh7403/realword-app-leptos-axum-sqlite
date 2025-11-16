@@ -204,7 +204,7 @@ pub fn HomePage(username: crate::auth::UsernameSignal) -> impl IntoView {
     let run_search = expect_context::<ServerAction<SearchAction>>();
     view! {
         <Title text="Home" />
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 bg-gray-200 px-2 py-2 sm:px-0">
+        <div class="mx-auto lg:px-8 bg-gray-200 px-2 py-2 sm:px-0">
             <div class="">
                 <div class="flex justify-between">
                     <div>
@@ -480,7 +480,7 @@ fn SearchView(
                         }}
                     </button>
                     <div>
-                        <Show when=move || (open_article_cnt.get() > 1 && show_article.get())>
+                        <Show when=move || (open_article_cnt.get() > 1) && show_article.get()>
                             <button
                                 class="text-blue-600 underline cursor-pointer"
                                 type="button"
@@ -496,7 +496,7 @@ fn SearchView(
                 </div>
 
             </div>
-            <Show when=move || show_article.get() && !hide_all.get()  fallback=|| ()>
+            <Show when=move || show_article.get() && !hide_all.get() fallback=|| ()>
                 <ArticleView slug=article_res.slug.clone() username />
             </Show>
         </div>
