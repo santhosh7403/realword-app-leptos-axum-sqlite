@@ -60,9 +60,7 @@ pub fn Article(username: crate::auth::UsernameSignal) -> impl IntoView {
                         .map(move |x| {
                             x.map(move |article_result| {
                                 title.set(article_result.article.slug.to_string());
-                                view! {
-                                    <ArticlePage username result=article_result />
-                                }
+                                view! { <ArticlePage username result=article_result /> }
                             })
                         })
                 }}
@@ -94,7 +92,7 @@ fn ArticlePage(username: crate::auth::UsernameSignal, result: ArticleResult) -> 
 
     view! {
         <Show when=move || show_modal.get()>
-            <ArticlePageModal on_back_event username article_signal user_signal/>
+            <ArticlePageModal on_back_event username article_signal user_signal />
         </Show>
     }
 }
@@ -126,7 +124,7 @@ where
                             <AuthorUserIcon article_signal />
                         </div>
                         <div>
-                            <BackToButton on_back_event is_top=true/>
+                            <BackToButton on_back_event is_top=true />
                         </div>
                     </div>
                     <div class="mb-5">
@@ -136,7 +134,7 @@ where
                 <div class="mb-5 px-1 py-1">
                     <CommentSection username article=article_signal user_signal />
                 </div>
-                    <BackToButton on_back_event is_top=false/>
+                <BackToButton on_back_event is_top=false />
             </div>
         </div>
     }
@@ -152,7 +150,12 @@ where
             <div class="flex justify-end mb-5">
                 <button
                     type="cancel"
-                    class=move||{format!("fixed bg-blue-700 hover:bg-blue-800 px-15 py-3 text-white font-semibold rounded-lg transition-colors duration-300 {}", if is_top {"top-0 left-0"}else{"bottom-4 right-4"})}
+                    class=move || {
+                        format!(
+                            "fixed bg-blue-700 hover:bg-blue-800 px-15 py-3 text-white font-semibold rounded-lg transition-colors duration-300 {}",
+                            if is_top { "top-0 left-0" } else { "bottom-4 right-4" },
+                        )
+                    }
                     on:click=move |_| on_back_event()
                 >
                     Back
@@ -259,16 +262,24 @@ pub fn CommentSection(
                             prop:value=move || comment_value.get()
                             placeholder="Write a new comment...(min length 3 char)"
                             on:input=on_comment_input
-                        >
-                        </textarea>
+                        ></textarea>
                     </div>
                     <div class="flex mb-5">
                         <CurrentUserIcon user_signal />
                         <div class="px-2">
                             <button
-                                class=move||format!("rounded px-1 py-1 text-sm font-medium text-white {}", if post_button_disable() {"bg-gray-300 cursor-not-allowed"}else{"bg-blue-700 hover:bg-blue-800"})
+                                class=move || {
+                                    format!(
+                                        "rounded px-1 py-1 text-sm font-medium text-white {}",
+                                        if post_button_disable() {
+                                            "bg-gray-300 cursor-not-allowed"
+                                        } else {
+                                            "bg-blue-700 hover:bg-blue-800"
+                                        },
+                                    )
+                                }
                                 type="submit"
-                                prop:disabled=move||post_button_disable
+                                prop:disabled=move || post_button_disable
                             >
                                 "Post Comment"
                             </button>

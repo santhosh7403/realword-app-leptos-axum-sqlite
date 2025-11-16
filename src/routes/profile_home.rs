@@ -99,7 +99,7 @@ pub fn Profile(username: crate::auth::UsernameSignal) -> impl IntoView {
     view! {
         <Title text=move || format!("{}'s profile", route_user()) />
         <div>
-            <ProfileHome on_back_event username route_user/>
+            <ProfileHome on_back_event username route_user />
         </div>
     }
 }
@@ -341,10 +341,7 @@ where
     C: Fn() + 'static + Clone,
 {
     view! {
-        <h4
-            class="text-blue-500 underline cursor-pointer"
-            on:click=move |_| on_back_event()
-        >
+        <h4 class="text-blue-500 underline cursor-pointer" on:click=move |_| on_back_event()>
             Back to Home
         </h4>
     }

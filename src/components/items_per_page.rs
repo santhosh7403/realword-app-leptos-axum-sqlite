@@ -33,7 +33,12 @@ pub fn ItemsPerPage() -> impl IntoView {
                         } else {
                             "".to_string()
                         },
-                        pagination.get().unwrap_or_default().reset_page().set_amount(per_page.get().unwrap()).to_string(),
+                        pagination
+                            .get()
+                            .unwrap_or_default()
+                            .reset_page()
+                            .set_amount(per_page.get().unwrap())
+                            .to_string(),
                         if favourite().unwrap_or_default() { "&favourites=true" } else { "" },
                     );
                     navigate(&page_url, Default::default());

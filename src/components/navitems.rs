@@ -18,7 +18,7 @@ pub(crate) fn NavItems(
 
     view! {
         <div class="bg-gray-800 text-white shadow-lg md:relative md:top-0 md:left-0 md:right-auto md:w-full
-         rounded-b-xl px-4 py-3 md:py-4">
+        rounded-b-xl px-4 py-3 md:py-4">
             <div class="flex justify-around items-center">
                 <A href="/">
                     <div class="group navitem">
@@ -33,32 +33,40 @@ pub(crate) fn NavItems(
                             <A href="/editor">
                                 <div class="group navitem">
                                     <i class="fa-solid fa-square-plus navitem-icon"></i>
-                                    <span class="text-xs md:text-base mt-1 font-semibold">New Article</span>
+                                    <span class="text-xs md:text-base mt-1 font-semibold">
+                                        New Article
+                                    </span>
                                 </div>
                             </A>
 
                             <A href="/settings">
                                 <div class="group navitem">
                                     <i class="fa-solid fa-gear navitem-icon"></i>
-                                    <span class="text-xs md:text-base mt-1 font-semibold">Settings</span>
+                                    <span class="text-xs md:text-base mt-1 font-semibold">
+                                        Settings
+                                    </span>
                                 </div>
                             </A>
                             <A href=profile_href.clone()>
                                 <div class="group navitem">
                                     <i class="fa-regular fa-circle-user navitem-icon"></i>
-                                    <span class="text-xs md:text-base mt-1 font-semibold">{profile_label}</span>
+                                    <span class="text-xs md:text-base mt-1 font-semibold">
+                                        {profile_label}
+                                    </span>
                                 </div>
                             </A>
 
                             <ActionForm action=logout>
                                 <button
                                     class="items-center border-none bg-transparent
-                                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                     on:click=move |_| login.clear()
                                 >
                                     <div class="group navitem">
                                         <i class="fa-solid fa-right-from-bracket navitem-icon"></i>
-                                        <span class="text-xs md:text-base mt-1 font-semibold">Logout</span>
+                                        <span class="text-xs md:text-base mt-1 font-semibold">
+                                            Logout
+                                        </span>
                                     </div>
                                 </button>
                             </ActionForm>

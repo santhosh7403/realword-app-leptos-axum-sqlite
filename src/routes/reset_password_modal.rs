@@ -423,7 +423,10 @@ where
                         <p class=move || {
                             format!(
                                 "font-medium {}",
-                                if reset_status.get().starts_with("Email sent") || reset_status.get().starts_with("Password successfully changed")
+                                if reset_status.get().starts_with("Email sent")
+                                    || reset_status
+                                        .get()
+                                        .starts_with("Password successfully changed")
                                     || reset_status.get().starts_with("Passwords matched!")
                                 {
                                     "text-green-500"

@@ -30,9 +30,7 @@ pub fn ArticleView(slug: String, username: crate::auth::UsernameSignal) -> impl 
                         .get()
                         .map(move |x| {
                             x.map(move |article_result| {
-                                view! {
-                                    <ArticleViewPage username result=article_result />
-                                }
+                                view! { <ArticleViewPage username result=article_result /> }
                             })
                         })
                 }}
@@ -46,9 +44,7 @@ fn ArticleViewPage(username: crate::auth::UsernameSignal, result: ArticleResult)
     let article_signal = RwSignal::new(result.article.clone());
     let user_signal = RwSignal::new(result.logged_user);
 
-    view! {
-            <ArticleViewPageModal username article_signal user_signal/>
-    }
+    view! { <ArticleViewPageModal username article_signal user_signal /> }
 }
 
 #[component]
@@ -93,7 +89,7 @@ pub fn ArticleMetaForView(
     view! {
         <div class="article-meta">
             <div class="flex items-center gap-4 text-gray-700">
-                    <AuthorUserIcon article_signal=article />
+                <AuthorUserIcon article_signal=article />
                 <div class="flex items-center gap-1">
                     <span class="">
                         <i class="fa-solid fa-calendar w-4 h-4"></i>
@@ -115,7 +111,7 @@ pub fn ArticleMetaForView(
                         " Comments: " {move || article.with(|x| x.comments_count)}
                     </span>
                 </div>
-                    <ButtonFav username=username article=article />
+                <ButtonFav username=username article=article />
             </div>
         </div>
     }
