@@ -1,10 +1,10 @@
 use super::user_icons::AuthorUserIcon;
 use crate::app::{GlobalState, GlobalStateStoreFields};
 use leptos::prelude::*;
-use leptos_router::components::*;
+use leptos_router::{components::*, hooks::use_query_map};
 use reactive_stores::Store;
 
-use super::buttons::{ButtonFav, ButtonFollow};
+use super::buttons::{ButtonFav, ButtonFavFavourited, ButtonFollow};
 use crate::models::Article;
 
 pub type ArticleSignal = RwSignal<crate::models::Article>;
@@ -66,12 +66,14 @@ fn ArticlePreview(username: crate::auth::UsernameSignal, article: ArticleSignal)
 
             <div class="flex justify-between items-end">
                 <A href=move || format!("/article/{}", article.with(|x| x.slug.clone()))>
-                    <span class="hover:text-blue-600 hover:underline cursor-pointer">"Read more..."</span>
+                    <span class="hover:text-blue-600 hover:underline cursor-pointer">
+                        "Read more..."
+                    </span>
                 </A>
-                <Show
-                    when=move || article.with(|x| !x.tag_list.is_empty() && x.tag_list.first().unwrap() != "")
+                <Show when=move || {
+                    article.with(|x| !x.tag_list.is_empty() && x.tag_list.first().unwrap() != "")
+                }>
                     // fallback=|| view! { <span>"No tags"</span> }
-                >
                     <div class="flex flex-wrap gap-1">
                         <i class="fa-solid fa-hashtag py-1"></i>
                         <For
@@ -120,6 +122,9 @@ pub fn ArticleMeta(
 
     let delete_a = ServerAction::<DeleteArticleAction>::new();
 
+    let query = use_query_map();
+    let favourite = move || query.with(|x| x.get("favourites").map(|_| true));
+
     view! {
         <div class="article-meta">
             <div class="flex items-center gap-4 text-gray-700">
@@ -156,7 +161,10 @@ pub fn ArticleMeta(
                                 fallback=move || {
                                     view! {
                                         <Show
-                                            when=move || {author_user(); username.with(Option::is_some)}
+                                            when=move || {
+                                                author_user();
+                                                username.with(Option::is_some)
+                                            }
                                             fallback=move || {
                                                 view! { <ButtonFav username article /> }
                                             }
@@ -177,11 +185,7 @@ pub fn ArticleMeta(
                                         name="slug"
                                         value=move || article.with(|x| x.slug.to_string())
                                     />
-                                    <input
-                                        type="hidden"
-                                        name="back_url"
-                                        value=back_url
-                                    />
+                                    <input type="hidden" name="back_url" value=back_url />
                                     <button
                                         type="submit"
                                         class="text-red-400 hover:rounded hover:border hover:bg-red-100"
@@ -194,7 +198,14 @@ pub fn ArticleMeta(
                         }
                     }
                 >
-                    <ButtonFav username=username article=article />
+                    <Show
+                        when=move || favourite().unwrap_or_default()
+                        fallback=move || {
+                            view! { <ButtonFav username=username article=article /> }
+                        }
+                    >
+                        <ButtonFavFavourited article />
+                    </Show>
                 </Show>
             </div>
         </div>

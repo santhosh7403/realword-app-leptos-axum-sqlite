@@ -81,20 +81,26 @@ pub fn ButtonFollow(
 
     view! {
         <Show when=move || logged_user.get().unwrap_or_default() != author.get() fallback=|| ()>
-        <form>
+            <form>
                 <div class="rounded-md">
                     <button
                         class="btn btn-sm btn-outline-secondary"
                         class=(
                             "text-yellow-500",
-                            move || !is_hovered.get() && following_signal.get().unwrap_or(FollowUser(false)).0,
+                            move || {
+                                !is_hovered.get()
+                                    && following_signal.get().unwrap_or(FollowUser(false)).0
+                            },
                         )
                         class=(
                             "text-yellow-400",
-                            move || is_hovered.get() && !following_signal.get().unwrap_or(FollowUser(false)).0,
+                            move || {
+                                is_hovered.get()
+                                    && !following_signal.get().unwrap_or(FollowUser(false)).0
+                            },
                         )
-                        disabled=move||follow.pending().get()
-                        on:click=move|_|follow_update()
+                        disabled=move || follow.pending().get()
+                        on:click=move |_| follow_update()
                         on:mouseenter=move |_| set_is_hovered(true)
                         on:mouseleave=move |_| set_is_hovered(false)
                     >
@@ -250,9 +256,9 @@ pub fn ButtonFav(
                         )
                         disabled=move || {
                             username.get().unwrap() == article.with(|x| x.author.username.clone())
-                            || make_fav.pending().get()
+                                || make_fav.pending().get()
                         }
-                        on:click=move|_| change_fav()
+                        on:click=move |_| change_fav()
                     >
 
                         <Show
@@ -283,5 +289,23 @@ pub fn ButtonFav(
                 </form>
             </div>
         </Show>
+    }
+}
+
+#[component]
+pub fn ButtonFavFavourited(article: super::article_preview::ArticleSignal) -> impl IntoView {
+    view! {
+        <div class=move || {
+            format!(
+                "{}",
+                if article.with(|x| { x.favorites_count > 0 }) {
+                    "px-8 text-yellow-500"
+                } else {
+                    "px-8"
+                },
+            )
+        }>
+            <span>" Favourites: "{move || article.with(|x| x.favorites_count)}</span>
+        </div>
     }
 }
