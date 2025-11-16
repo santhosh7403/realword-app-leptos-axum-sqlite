@@ -1,84 +1,118 @@
-# A near realworld leptos web app with axum sqlite backend
+# 🚀 A Near-Realworld Leptos Web App with Axum and SQLite Backend
 
 <picture>
     <source srcset="https://raw.githubusercontent.com/leptos-rs/leptos/main/docs/logos/Leptos_logo_Solid_White.svg" media="(prefers-color-scheme: dark)">
     <img src="https://raw.githubusercontent.com/leptos-rs/leptos/main/docs/logos/Leptos_logo_RGB.svg" alt="Leptos Logo">
 </picture>
 
-This is another Leptos demo application that I worked on as part of my learning Rust/Leptos and carrying out experiments. This one is little more complex compared to the previously shared one: [ demo-tools-app-leptos-07-actix-tailwind](https://github.com/santhosh7403/demo-tools-app-leptos-07-actix-tailwind). I hope this code may help someone who is considering using the Leptos framework in their next project and wants a hands-on approach or a peek into a more realworld working example.
+This repository hosts a **Leptos demo application** developed as part of my exploration and experimentation with the **Rust/Leptos framework**. This project is more complex than the previously shared [ demo-tools-app-leptos-07-actix-tailwind](https://github.com/santhosh7403/demo-tools-app-leptos-07-actix-tailwind) and is intended to serve as a **more realistic, working example** for developers considering Leptos for their next project. I hope this hands-on code provides valuable insight into the framework's capabilities.
 
-To make it run in few simple steps, made a sqlite version (though, [ recent opinions ](https://dev.to/shayy/everyone-is-wrong-about-sqlite-4gjf) suggest sqlite itself is good enough if your app isn't too many writes ). So to see it, just clone the project follow the instructions below.
+To facilitate a rapid setup, this version utilizes **SQLite** for the backend database. This choice is supported by the growing sentiment that SQLite is robust for many applications, particularly those not defined by heavy write operations [ recent opinions ](https://dev.to/shayy/everyone-is-wrong-about-sqlite-4gjf). To run the application, simply clone the project and follow the installation instructions below.
 
-Before proceeding to clone, you may take a look at the [ screenshots here ](https://github.com/santhosh7403/realword-app-leptos-axum-sqlite/blob/main/App_Screenshots.md), that will give you a quick glance into this app and you can decide.
+Before proceeding, you can view the application's functionality via the [ screenshots here ](https://github.com/santhosh7403/realworld-app-leptos-axum-sqlite/blob/main/App_Screenshots.md).
 
-There is a Postgres version of this app as well (full-text-search had slight differences, though) and you can [ find it here ](https://github.com/santhosh7403/realword-app-leptos-axum).
+A **PostgreSQL version** of this application, which features minor differences in the full-text search implementation, is also available [ here ](https://github.com/santhosh7403/realworld-app-leptos-axum).
 
-This app includes:
+---
 
-- Leptos
-- axum
-- SSR
-- sqlite
-- fts5
-- Modal Windows
-- argon2 (password encrypt)
-- uuid
-- tailwindcss
-- fontawesome icons
+## 🛠️ Key Technologies & Features
 
-# Install and run
+This application leverages the following core technologies and features:
 
-By default, `cargo-leptos` uses `nightly` Rust, `cargo-generate`, etc. If you run into any trouble, you may need to install one or more of these tools. Please refer to the [ rustup documentation ](https://rustup.rs).
+* Leptos
+* axum
+* Server-Side Rendering (SSR)
+* sqlite
+* fts5 (Full-Text Search)
+* Modal Windows
+* argon2 (Password Encryption)
+* uuid
+* tailwindcss
+* fontawesome icons
 
-## Tools
 
-Make sure that the Rust toolchains and cargo-leptos are already installed
+---
 
-1. `rustup toolchain install nightly --allow-downgrade` - make sure you have Rust nightly
-2. `rustup update` - update the rust toolchains to latest
-3. `rustup target add wasm32-unknown-unknown` - add the ability to compile Rust to WebAssembly
-4. `cargo install cargo-generate` - install cargo-generate binary
-5. `cargo install cargo-leptos --locked`
+## ⚙️ Installation and Setup
 
-## Clone
+**Prerequisites**
 
-Clone the repo
+By default, `cargo-leptos` requires the **Rust nightly** toolchain and several cargo extensions. If you encounter issues, ensure these tools are installed. Consult the [ rustup documentation ](https://rustup.rs) for detailed instructions.
 
-`git clone https://github.com/santhosh7403/realword-app-leptos-axum-sqlite.git`
+### Required Tools
 
-`cd realword-app-leptos-axum-sqlite`
+Ensure the following Rust toolchains and dependencies are installed:
 
-## Database
 
-`source .env` - set the DATABASE_URL env variable
+1.  `rustup toolchain install nightly --allow-downgrade` (Installs or ensures the **Rust nightly** toolchain is available)
+2.  `rustup update` (Updates all installed Rust toolchains to their latest version)
+3.  `rustup target add wasm32-unknown-unknown` (Adds the target necessary for compiling Rust to WebAssembly)
+4.  `cargo install cargo-generate` (Installs the project templating tool)
+5.  `cargo install cargo-leptos --locked` (Installs the essential Leptos build tool)
 
-follow the steps in [ README_DATABASE.md ](https://github.com/santhosh7403/realword-app-leptos-axum-sqlite/blob/main/README_DATABASE.md) to initialize the database
 
-## Run
+### Clone Repository
+
+Clone the repository to your local machine:
+
+```bash
+git clone https://github.com/santhosh7403/realworld-app-leptos-axum-sqlite.git]
+cd realword-app-leptos-axum-sqlite
+```
+
+
+### Database Initialization
+
+1. `source .env` - set the DATABASE_URL env variable
+
+2, Follow the steps in [ README_DATABASE.md ](https://github.com/santhosh7403/realworld-app-leptos-axum-sqlite/blob/main/README_DATABASE.md) to initialize the database schema and data.
+
+### Run Application
 
 You may now build and run the application:
 
-`cargo leptos watch` or `cargo leptos serve`
+```bash
+cargo leptos watch 
+# OR
+cargo leptos serve
+```
 
-# Application access
+### Application access
 
-Once application started, access application from you web browser [ localhost:3000 ](http://localhost:3000/)
+Once the application has started successfully, access it via your web browser at [ localhost:3000 ](http://localhost:3000/)
 
-The application screen looks like this
+Sample application screens.
+
 <img width="1476" height="907" alt="image" src="https://github.com/user-attachments/assets/e89636a4-444a-40a3-b5e9-1232312befdd" />
 <img width="1477" height="942" alt="image" src="https://github.com/user-attachments/assets/8d60c6fa-000f-4a93-9f10-4282b6cad0f7" />
 <img width="1468" height="717" alt="image" src="https://github.com/user-attachments/assets/9153d428-8a52-49d9-b450-e8e2a91a2d85" />
 
-More screenshots are [ available here ](https://github.com/santhosh7403/realword-app-leptos-axum-sqlite/blob/main/App_Screenshots.md)
+More screenshots are [ available here ](https://github.com/santhosh7403/realworld-app-leptos-axum-sqlite/blob/main/App_Screenshots.md)
 
-To showcase the app and test it out, some sample users and data are pre-populated. User names 'user1' to 'user5' are available and the password is same as the username. If you want to remove this data, you may delete the 'basedata' files inside the `./migrations` folder and setup database as explained in [DATABASE_README.md](https://github.com/santhosh7403/realword-app-leptos-axum-sqlite/blob/main/README_DATABASE.md).
+### Sample User Data
 
-# Sqlite fts5 (full-text search)
+The application is pre-populated with sample users and data for immediate testing and demonstration.
 
-The full-text search feature covers three fields from the `articles` table. If you are interested in learning how it works or want to experiment different search methods, please refer to the sqlite fts5 documentation [ here ](https://www.sqlite.org/fts5.html#overview_of_fts5)
+1.   Available Users: user1 to user5
 
-# Inspiration and Thanks
+2.   Password: The password is the same as the username (e.g., user1 has a password of user1).
 
-The base of this app is from [ here ](https://github.com/Bechma/realworld-leptos), though there may be other original versions some where else, not sure.
+To remove this default data, delete the basedata files within the `./migrations` folder and follow the database setup steps outlined in the [README_DATABASE.md](https://github.com/santhosh7403/realworld-app-leptos-axum-sqlite/blob/main/README_DATABASE.md).
 
-I initially started this as leptos06 to 07 change in this app (though, above reference repo also seems updated now!) as my learning and got interested to try out more experiments. Overall user interface changed, some with modal windows, tailwindcss and fontawesome icons, re-wired pages, some functionality changes etc. Currently added sqlite supported FTS5 (full text search) feature to enable a wide search (see the screenshot above). Search results pagination changed to a new way to avoid results page reload.
+### 🔍SQLite FTS5 (Full-Text Search) Implementation
+
+The application features a robust full-text search capability powered by SQLite FTS5, which indexes three key fields from the `articles` table. For developers interested in the implementation or experimenting with different search methodologies, comprehensive documentation is available in the sqlite fts5 documentation[ here ](https://www.sqlite.org/fts5.html#overview_of_fts5)
+
+## 🙏 Inspiration and Acknowledgements
+
+The foundational structure of this application is derived from the realworld example by [Bechma/realworld-leptos](https://github.com/Bechma/realworld-leptos), with appreciation to any antecedent projects.
+
+This particular version was initiated during the transition from Leptos 0.6 to 0.7 as a personal learning exercise. It has since undergone significant experimentation and refinement, including:
+
+*   A complete user interface redesign utilizing tailwindcss and fontawesome icons.
+
+*   Implementation of modal windows and re-wired page navigation.
+
+*   Integration of SQLite FTS5 for comprehensive full-text search capabilities.
+
+*   An updated, non-reloading pagination method for search results
